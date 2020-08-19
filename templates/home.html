@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %} Home {% endblock title %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" type="text/css" href="../static/home_style.css">
+{% endblock stylesheet %}
+
+{% block content %}
+    <ul>
+        <li><a class="active" href="#home">Personal Investments</a></li>
+        <li><a href="#news">S&P 500</a></li>
+        <li><a href="#contact">Other Indices</a></li>
+        <li style="float:right"><a href="#about">About</a></li>
+    </ul>
+{% endblock content %}
