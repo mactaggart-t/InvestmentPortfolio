@@ -3,9 +3,17 @@
     <head>
         <meta charset="utf-8">
         <title>{% block title %}Default title{% endblock title %}</title>
+        <link rel="stylesheet" type="text/css" href="/static/base_styles.css">
         {%  block stylesheet %} {% endblock stylesheet %}
+        {% block scripts %} {% endblock scripts %}
     </head>
     <body>
+        <ul>
+            <li><a class="active" href="personalInv">Personal Investments</a></li>
+            <li><a href="news">S&P 500</a></li>
+            <li><a href="contact">Other Indices</a></li>
+            <li style="float:right"><a href="about">About</a></li>
+        </ul>
         {% block content %}{% endblock content %}
     </body>
 </html>

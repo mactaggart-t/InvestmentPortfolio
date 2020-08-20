@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %} Home {% endblock title %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" type="text/css" href="/static/personal_inv_styles.css">
+{% endblock stylesheet %}
+
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/20.1.6/css/dx.common.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/20.1.6/css/dx.light.css" />
+    <script src="https://cdn3.devexpress.com/jslib/20.1.6/js/dx.all.js"></script>
+    <script src="/static/personal_inv.js"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <div id="searchBox"></div>
+    <div id="submitBtn"></div>
+{% endblock content %}
