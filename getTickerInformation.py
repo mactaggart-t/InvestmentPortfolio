@@ -29,5 +29,16 @@ def get_historic_data(ticker, end_dt, begin_dt=datetime(1980, 1, 1, 0, 0).timest
                 dates.append(date(int(cur_date[2]), list(calendar.month_abbr).index(cur_date[0]), int(cur_date[1])))
                 close_prices.append(cols[4].text)
         end_dt = end_dt - 8640000
-        print(end_dt)
     return dates, close_prices
+
+
+def get_sector(ticker):
+    return 'Tech'
+
+
+def get_industry(ticker):
+    return 'Tech'
+
+
+def get_name(ticker):
+    return 'Sample'

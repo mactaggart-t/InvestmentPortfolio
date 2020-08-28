@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 
 
-def add_security(sec_name, sec_sector, sec_industry):
+def add_security(ticker, sec_name, sec_sector, sec_industry):
     try:
         connection = mysql.connector.connect(host='localhost',
                                              port=3306,
@@ -12,9 +12,9 @@ def add_security(sec_name, sec_sector, sec_industry):
 
         cursor = connection.cursor(prepared=True)
         sql_insert_query = """INSERT INTO all_securities
-                           (sec_name, sector, industry) VALUES (%s, %s, %s)"""
+                           (sec_name, sector, industry, ticker) VALUES (%s, %s, %s, %s)"""
 
-        cursor.executemany(sql_insert_query, [(sec_name, sec_sector, sec_industry)])
+        cursor.executemany(sql_insert_query, [(sec_name, sec_sector, sec_industry, ticker)])
         connection.commit()
     except Error as error:
         print("parameterized query failed {}".format(error))
