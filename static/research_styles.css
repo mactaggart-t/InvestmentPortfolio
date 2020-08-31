@@ -1,0 +1,13 @@
+.search_box{
+    margin-right: 5px;
+    max-width: 25%;
+    min-width: 200px;
+    float: left;
+}
+.search_container{
+    width: 100%;
+    margin: 5px;
+}
+.submit_button{
+    float:left;
+}

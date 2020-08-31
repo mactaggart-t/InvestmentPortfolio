@@ -14,7 +14,7 @@ def get_historic_price_db(sec_id):
         sql_insert_query = """SELECT record_dt, close_price FROM historic_data
                                    WHERE sec_id = %s"""
 
-        cursor.execute(sql_insert_query, sec_id)
+        cursor.execute(sql_insert_query, (sec_id,))
         data = cursor.fetchall()
         formated_data = []
         for i in data:

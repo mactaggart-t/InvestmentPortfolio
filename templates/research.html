@@ -2,6 +2,10 @@
 
 {% block title %} Research Securities {% endblock title %}
 
+{% block stylesheet %}
+    <link rel="stylesheet" type="text/css" href="/static/research_styles.css">
+{% endblock stylesheet %}
+
 {% block scripts %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/20.1.6/css/dx.common.css" />
@@ -11,7 +15,9 @@
 {% endblock scripts %}
 
 {% block content %}
-    <div id="searchBox"></div>
-    <div id="submitBtn"></div>
+    <div id="search-container" class="search_container">
+        <div id="searchBox" class="search_box"></div>
+        <div id="submitBtn" class="submit_button"></div>
+    </div>
     <div id="securityGraph"></div>
 {% endblock content %}

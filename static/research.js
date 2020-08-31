@@ -21,8 +21,13 @@ $(function() {
                     ticker_name: currentTicker
                 },
                 success: function(response) {
-                    $("#securityGraph").dxChart("option", "dataSource", response);
-                    $("#securityGraph").dxChart().refresh();
+                    if (response === 'DNE'){
+                        DevExpress.ui.notify("Error: Ticker Does Not Exist", "warning", 500);
+                    }
+                    else{
+                        $("#securityGraph").dxChart("option", "dataSource", response);
+                        $("#securityGraph").dxChart().refresh();
+                    }
                 },
                 error: function(xhr) {
                     DevExpress.ui.notify("Error", "warning", 500);
