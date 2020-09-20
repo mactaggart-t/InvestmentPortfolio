@@ -8,7 +8,7 @@ from sql.add_historic_price import add_historic_price
 from sql.add_security import add_security
 from sql.get_security_id import get_security_id, not_in_db, get_unfilled_tickers, get_all_tickers
 from sql.get_historic_price import get_historic_price_db
-from sql.load_s_and_p_data import get_all_s_and_p, test_connection
+from sql.load_s_and_p_data import get_all_s_and_p
 
 app = Flask(__name__)
 
