@@ -10,35 +10,35 @@ from sql.get_security_id import get_security_id, not_in_db, get_unfilled_tickers
 from sql.get_historic_price import get_historic_price_db
 from sql.load_s_and_p_data import get_all_s_and_p, test_connection
 
-application = Flask(__name__)
+app = Flask(__name__)
 
 
-@application.route('/')
+@app.route('/')
 def home():
     return render_template('home.html')
 
 
-@application.route('/personalInv')
+@app.route('/personalInv')
 def personal_inv():
     return render_template('personalInv.html')
 
 
-@application.route('/research')
+@app.route('/research')
 def research_home():
     return render_template('research.html')
 
 
-@application.route('/s_and_p')
+@app.route('/s_and_p')
 def render_s_and_p():
     return render_template('s_and_p.html')
 
 
-@application.route('/getAllTickers')
+@app.route('/getAllTickers')
 def get_all_tick():
     return jsonify(get_all_tickers())
 
 
-@application.route('/getTickerInfo')
+@app.route('/getTickerInfo')
 def get_price():
     ticker_name = request.args['tickers'].replace('[', '').replace(']', '').replace('"', '').split(',')
     sec_id = []
@@ -63,7 +63,7 @@ def get_price():
     return all_data
 
 
-@application.route('/getSecurityChart')
+@app.route('/getSecurityChart')
 def get_chart():
     ticker_name = request.args['ticker_name']
     start_dt = request.args['start_dt']
@@ -71,7 +71,7 @@ def get_chart():
     return get_historic_data(ticker_name, datetime(2016, 1, 19, 0, 0).timestamp(), datetime.today().timestamp())
 
 
-@application.route('/loadSAndP')
+@app.route('/loadSAndP')
 def load_s_and_p():
     test_connection()
     """unfilled_tickers = get_unfilled_tickers()
@@ -87,4 +87,4 @@ def load_s_and_p():
 
 
 if __name__ == '__main__':
-    application.run(debug=True)
+    app.run(debug=True)
