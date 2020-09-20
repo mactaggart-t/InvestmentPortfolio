@@ -105,3 +105,28 @@ def get_ticker_from_id(sec_id):
             cursor.close()
             connection.close()
     return ticker
+
+
+def get_all_tickers():
+    try:
+        connection = mysql.connector.connect(host='localhost',
+                                             port=3306,
+                                             user='invest_port',
+                                             database='investment_portfolio',
+                                             password='InvestPortPass')
+
+        cursor = connection.cursor(prepared=True)
+        sql_insert_query = """SELECT ticker FROM all_securities"""
+
+        cursor.execute(sql_insert_query)
+        tickers = cursor.fetchall()
+        all_tickers = []
+        for i in tickers:
+            all_tickers.append(i[0])
+    except Error as error:
+        print("parameterized query failed {}".format(error))
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+    return all_tickers

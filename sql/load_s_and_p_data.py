@@ -1,5 +1,9 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+import mysql.connector
+import pymysql
+import boto3
+import os
 
 
 def get_all_s_and_p():
@@ -20,3 +24,19 @@ def get_all_s_and_p():
             sector.append(cols[3].text)
             industry.append(cols[4].text)
     return tickers, names, sector, industry
+
+
+def test_connection():
+    try:
+        print('foo')
+        connection = pymysql.connect(host='investmentportfolio.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                     port=3306,
+                                     user='investPort',
+                                     password='InvestPortPass')
+        print('foo2')
+        cur = connection.cursor(prepared=True)
+        cur.execute("""SELECT now()""")
+        query_results = cur.fetchall()
+        print(query_results)
+    except Exception as e:
+        print("Database connection failed due to {}".format(e))

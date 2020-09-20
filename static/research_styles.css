@@ -11,3 +11,15 @@
 .submit_button{
     float:left;
 }
+.time_selector{
+    margin: 5px auto 5px;
+}
+.percent_selector{
+    float: right;
+    margin: 5px;
+}
+.buttongroup-container {
+    display: flex;
+    justify-content: center;
+    font-size: 16px;
+}
