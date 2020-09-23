@@ -38,6 +38,6 @@ def transfer_data():
         print("parameterized query failed {}".format(error))
     finally:
             cursor2.close()
-            connection_local.close()
+            #connection_local.close()
             connection_hosted.close()
             print("MySQL connection is closed")
