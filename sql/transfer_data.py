@@ -6,11 +6,11 @@ import pandas as pd
 
 def transfer_data():
     try:
-        connection_local = mysql.connector.connect(host='localhost',
+        """connection_local = mysql.connector.connect(host='localhost',
                                              port=3306,
                                              database='investment_portfolio',
                                              user='invest_port',
-                                             password='InvestPortPass')
+                                             password='InvestPortPass')"""
 
         connection_hosted = mysql.connector.connect(host='z8dl7f9kwf2g82re.cbetxkdyhwsb.us-east-1.rds.amazonaws.com	',
                                              port=3306,
