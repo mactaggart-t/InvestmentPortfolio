@@ -1,16 +1,15 @@
-import mysql.connector
 from mysql.connector import Error
+import pymysql
 
 
 def get_historic_price_db(sec_id):
     try:
-        connection = mysql.connector.connect(host='localhost',
-                                             port=3306,
-                                             database='investment_portfolio',
-                                             user='invest_port',
-                                             password='InvestPortPass')
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
 
-        cursor = connection.cursor(prepared=True)
+        cursor = connection_hosted.cursor()
         sql_insert_query = """SELECT record_dt, close_price FROM historic_data
                                    WHERE sec_id = %s"""
 
@@ -22,8 +21,7 @@ def get_historic_price_db(sec_id):
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("MySQL connection is closed")
+        cursor.close()
+        connection_hosted.close()
+        print("MySQL connection is closed")
     return formated_data

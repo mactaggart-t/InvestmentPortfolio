@@ -1,16 +1,15 @@
-import mysql.connector
 from mysql.connector import Error
+import pymysql
 
 
 def get_security_id(ticker):
     try:
-        connection = mysql.connector.connect(host='localhost',
-                                             port=3306,
-                                             user='invest_port',
-                                             database='investment_portfolio',
-                                             password='InvestPortPass')
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
 
-        cursor = connection.cursor(prepared=True)
+        cursor = connection_hosted.cursor()
         sql_insert_query = """SELECT sec_id FROM all_securities
                            WHERE ticker = %s"""
 
@@ -22,21 +21,19 @@ def get_security_id(ticker):
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
+        cursor.close()
+        connection_hosted.close()
     return sec_id
 
 
 def not_in_db(sec_id):
     try:
-        connection = mysql.connector.connect(host='localhost',
-                                             port=3306,
-                                             user='invest_port',
-                                             database='investment_portfolio',
-                                             password='InvestPortPass')
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
 
-        cursor = connection.cursor(prepared=True)
+        cursor = connection_hosted.cursor()
         sql_insert_query = """SELECT close_price FROM historic_data
                            WHERE sec_id = %s"""
 
@@ -50,21 +47,19 @@ def not_in_db(sec_id):
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
+        cursor.close()
+        connection_hosted.close()
     return sec_id
 
 
 def get_unfilled_tickers():
     try:
-        connection = mysql.connector.connect(host='localhost',
-                                             port=3306,
-                                             user='invest_port',
-                                             database='investment_portfolio',
-                                             password='InvestPortPass')
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
 
-        cursor = connection.cursor(prepared=True)
+        cursor = connection_hosted.cursor()
         sql_insert_query = """SELECT distinct sec_id FROM historic_data"""
         sql_insert_query_2 = """SELECT distinct sec_id FROM all_securities"""
         cursor.execute(sql_insert_query)
@@ -78,21 +73,19 @@ def get_unfilled_tickers():
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
+        cursor.close()
+        connection_hosted.close()
     return unfilled_list
 
 
 def get_ticker_from_id(sec_id):
     try:
-        connection = mysql.connector.connect(host='localhost',
-                                             port=3306,
-                                             user='invest_port',
-                                             database='investment_portfolio',
-                                             password='InvestPortPass')
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
 
-        cursor = connection.cursor(prepared=True)
+        cursor = connection_hosted.cursor(prepared=True)
         sql_insert_query = """SELECT ticker FROM all_securities
                            WHERE sec_id = %s"""
 
@@ -101,21 +94,19 @@ def get_ticker_from_id(sec_id):
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
+        cursor.close()
+        connection_hosted.close()
     return ticker
 
 
 def get_all_tickers():
     try:
-        connection = mysql.connector.connect(host='localhost',
-                                             port=3306,
-                                             user='invest_port',
-                                             database='investment_portfolio',
-                                             password='InvestPortPass')
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
 
-        cursor = connection.cursor(prepared=True)
+        cursor = connection_hosted.cursor()
         sql_insert_query = """SELECT ticker FROM all_securities"""
 
         cursor.execute(sql_insert_query)
@@ -126,7 +117,6 @@ def get_all_tickers():
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
+        cursor.close()
+        connection_hosted.close()
     return all_tickers

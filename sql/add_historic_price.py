@@ -1,16 +1,15 @@
-import mysql.connector
 from mysql.connector import Error
+import pymysql
 
 
 def add_historic_price(sec_id, prices, dates):
     try:
-        connection = mysql.connector.connect(host='localhost',
-                                             port=3306,
-                                             database='investment_portfolio',
-                                             user='invest_port',
-                                             password='InvestPortPass')
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
 
-        cursor = connection.cursor(prepared=True)
+        cursor = connection_hosted.cursor()
         records_to_insert = []
         for i in range(0, len(prices)):
             records_to_insert.append((sec_id, dates[i], prices[i]))
@@ -18,13 +17,12 @@ def add_historic_price(sec_id, prices, dates):
                            (sec_id, record_dt, close_price) VALUES (%s,%s,%s)"""
 
         cursor.executemany(sql_insert_query, records_to_insert)
-        connection.commit()
+        connection_hosted.commit()
         print("Data inserted successfully table")
 
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("MySQL connection is closed")
+        cursor.close()
+        connection_hosted.close()
+        print("MySQL connection is closed")

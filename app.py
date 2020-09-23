@@ -74,7 +74,7 @@ def get_chart():
 
 @app.route('/loadSAndP')
 def load_s_and_p():
-    transfer_data()
+    # transfer_data()
     """unfilled_tickers = get_unfilled_tickers()
     for i in unfilled_tickers:
         sec_id = get_security_id(i)
