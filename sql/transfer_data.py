@@ -18,10 +18,10 @@ def transfer_data():
                                              user='w3k1r20op6d90r3x',
                                              password='figux2h2dqpp5u27')
 
-        cursor = connection_local.cursor(prepared=True)
+        #cursor = connection_local.cursor(prepared=True)
         sql_insert_query = """SELECT * FROM all_securities"""
-        cursor.execute(sql_insert_query)
-        rows = cursor.fetchall()
+        #cursor.execute(sql_insert_query)
+        #rows = cursor.fetchall()
         data = pd.read_csv('temp.csv')
         print(data)
         formated_data = []
@@ -37,7 +37,7 @@ def transfer_data():
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
-            cursor.close()
+            cursor2.close()
             connection_local.close()
             connection_hosted.close()
             print("MySQL connection is closed")
