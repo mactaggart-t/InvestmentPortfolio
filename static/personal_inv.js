@@ -1,22 +1,33 @@
-let currentTicker = '';
+let username = '';
+let password = '';
 $(function() {
-   $("#searchBox").dxTextBox({
-        placeholder: "Enter ticker...",
-        onValueChanged: function (e) {
-            currentTicker = e.value;
-        }
-    });
-   $("#submitBtn").dxButton({
+   $("#usernameBox").dxTextBox({
+       placeholder: "Enter username",
+       width: '250px',
+       onValueChanged: function (e) {
+           username = e.value;
+       }
+   });
+   $("#passwordBox").dxTextBox({
+       placeholder: "Enter password",
+       mode: 'password',
+       width: '250px',
+       onValueChanged: function (e) {
+           password = e.value;
+       }
+   });
+   $("#signIn").dxButton({
         stylingMode: "contained",
-        text: "Submit",
-        type: "default",
-        width: 120,
+        text: "Sign In",
+        type: "success",
+        width: 250,
         onClick: function() {
             $.ajax({
-                url: "/getTickerInfo",
+                url: "/signIn",
                 type: "get",
                 data: {
-                    ticker_name: currentTicker
+                    username: username,
+                    password: password
                 },
                 success: function(response) {
                     DevExpress.ui.notify(response, "info", 500);
@@ -26,5 +37,17 @@ $(function() {
                 }
             });
         }
-    });
+   });
+   $("#createAcct").dxButton({
+        stylingMode: "contained",
+        text: "Create Account",
+        type: "success",
+        width: 250
+   });
+   $("#viewSample").dxButton({
+        stylingMode: "contained",
+        text: "View Sample",
+        type: "success",
+        width: 250
+   });
 });

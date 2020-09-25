@@ -1,15 +1,13 @@
 from datetime import datetime
 
-from flask import Flask, render_template, jsonify, request, json
+from flask import Flask, render_template, jsonify, request
 
-from getTickerInformation import (get_security_price, get_historic_data, get_sector, get_industry, get_name,
+from getTickerInformation import (get_historic_data, get_sector, get_industry, get_name,
                                   ticker_exists)
 from sql.add_historic_price import add_historic_price
 from sql.add_security import add_security
-from sql.get_security_id import get_security_id, not_in_db, get_unfilled_tickers, get_all_tickers
+from sql.get_security_id import get_security_id, get_all_tickers
 from sql.get_historic_price import get_historic_price_db
-from sql.transfer_data import transfer_data
-from sql.load_s_and_p_data import get_all_s_and_p
 
 app = Flask(__name__)
 
