@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session
+from werkzeug.security import generate_password_hash
 
 from getTickerInformation import (get_historic_data, get_sector, get_industry, get_name,
                                   ticker_exists)
@@ -8,8 +9,10 @@ from sql.add_historic_price import add_historic_price
 from sql.add_security import add_security
 from sql.get_security_id import get_security_id, get_all_tickers
 from sql.get_historic_price import get_historic_price_db
+from sql.manage_users import user_taken, add_user, get_user_id, good_login
 
 app = Flask(__name__)
+app.secret_key = 'test'
 
 
 @app.route('/')
@@ -35,6 +38,49 @@ def render_s_and_p():
 @app.route('/getAllTickers')
 def get_all_tick():
     return jsonify(get_all_tickers())
+
+
+@app.route('/portfolio')
+def portfolio():
+    return render_template('portfolio.html')
+
+
+@app.route('/createAccount')
+def create_account():
+    return render_template('create_portfolio.html')
+
+
+@app.route('/createAcct')
+def create_acct():
+    username = request.args['username']
+    password1 = request.args['password']
+    password2 = request.args['secondPass']
+    if password1 != password2:
+        return 'no match'
+    elif password1 == '':
+        return 'no empty'
+    elif user_taken(username):
+        return 'username taken'
+    add_user(username, generate_password_hash(password1))
+    session['username'] = username
+    session['user_id'] = get_user_id(username)
+    return 'success'
+
+
+@app.route('/signIn')
+def log_in():
+    username = request.args['username']
+    password = request.args['password']
+    if good_login(username, password):
+        session['username'] = username
+        session['user_id'] = get_user_id(username)
+        return 'success'
+    return 'failure'
+
+
+@app.route('/getUsername')
+def get_username():
+    return session.get('username')
 
 
 @app.route('/getTickerInfo')

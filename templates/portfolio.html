@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %} Home {% endblock title %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" type="text/css" href="/static/portfolio_styles.css">
+{% endblock stylesheet %}
+
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/20.1.6/css/dx.common.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/20.1.6/css/dx.light.css" />
+    <script src="https://cdn3.devexpress.com/jslib/20.1.6/js/dx.all.js"></script>
+    <script src="/static/portfolio.js"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <div class="headerStyle">
+        <h1 id="headerText"></h1>
+    </div>
+    <div id="itemSelection" class="search_box"></div>
+    <br>
+    <br>
+    <br>
+    <div class="buttongroup-container">
+        <div id="single-selection" class="time_selector"></div>
+        <div id="percent_dollar" class="percent_selector"></div>
+    </div>
+    <div class="buttongroup-container">
+
+    </div>
+    <div id="securityGraph"></div>
+{% endblock content %}

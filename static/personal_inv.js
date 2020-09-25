@@ -30,7 +30,12 @@ $(function() {
                     password: password
                 },
                 success: function(response) {
-                    DevExpress.ui.notify(response, "info", 500);
+                    if (response === 'success') {
+                        window.location.href = 'portfolio';
+                    }
+                    else {
+                        DevExpress.ui.notify("Error: Incorrect Username or Password", "warning", 500);
+                    }
                 },
                 error: function(xhr) {
                     DevExpress.ui.notify("Error", "warning", 500);
@@ -39,10 +44,13 @@ $(function() {
         }
    });
    $("#createAcct").dxButton({
-        stylingMode: "contained",
-        text: "Create Account",
-        type: "success",
-        width: 250
+       stylingMode: "contained",
+       text: "Create Account",
+       type: "success",
+       width: 250,
+       onClick: function() {
+           window.location.href = 'createAccount';
+       }
    });
    $("#viewSample").dxButton({
         stylingMode: "contained",
