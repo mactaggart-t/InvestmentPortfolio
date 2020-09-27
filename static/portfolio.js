@@ -13,6 +13,11 @@ let timeSelections = [
     {'label': '5Y', 'text': '5Y', 'begin_date': deltaDate(today, 0, 0, -5)},
     {'label': '10Y', 'text': '10Y', 'begin_date': deltaDate(today, 0, 0, -10)},
     {'label': 'All', 'text': 'All', 'begin_date': all_date}];
+let newTicker = '';
+let newPrice = 0;
+let newShares = 0;
+let purchaseDt = new Date();
+let buyOrSell = "Buy";
 
 
 function deltaDate(input, days, months, years) {
@@ -46,7 +51,7 @@ function get_username() {
         url: "/getUsername",
         type: "get",
         success: function(response) {
-            document.getElementById("headerText").innerHTML = 'Hello, ' + response;
+            document.getElementById("headerText").innerHTML = 'Hello ' + response;
         },
     });
 }
@@ -113,9 +118,116 @@ function format_series(tickers){
 $(function() {
    get_username();
    $("#itemSelection").dxSelectBox({
-       items: ['Portfolio Balance', 'Individual Securities', 'Portfolio Diversification'],
-       placeholder: 'Select a view',
-       width: 250
+        items: ['Portfolio Balance', 'Individual Securities', 'Portfolio Diversification'],
+        placeholder: 'Select a view',
+        width: 250
+   });
+   $("#buySell").dxButton({
+       stylingMode: "contained",
+       text: "Add Purchase/Sale",
+       type: "default",
+       width: 200,
+       onClick: function() {
+           $("#popupContent").dxPopup("option", "visible", true);
+       }
+   });
+   $("#popupContent").dxPopup({
+       visible: false,
+       showCloseButton: true,
+       width: 500,
+       title: "Log a Purchase or Sale of a Security",
+       contentTemplate: function (contentElement) {
+            contentElement.append(
+                $("<p />").text("Enter Ticker: "),
+                $("<div />").attr("class", "center_horizontal").dxTextBox({
+                    placeholder: "Enter Ticker",
+                    width: '250px',
+                    onValueChanged: function (e) {
+                        newTicker = e.value;
+                    }
+                }),
+                $("<div />").attr("class", "center_drop").dxRadioGroup({
+                    items: ["Buy", "Sell"],
+                    layout: "horizontal",
+                    value: "Buy",
+                    width: 150,
+                    onValueChanged: function (e) {
+                        buyOrSell = e.value;
+                    }
+                }),
+                $("<p />").text("Enter Price: "),
+                $("<div />").attr("class", "center_horizontal").dxNumberBox({
+                    width: '250px',
+                    format: {
+                        type: 'currency',
+                        precision: 2,
+                        currency: 'USD'
+                    },
+                    onValueChanged: function (e) {
+                        newPrice = e.value;
+                    }
+                }),
+                $("<p />").text("Enter Number of Shares: "),
+                $("<div />").attr("class", "center_horizontal").dxNumberBox({
+                    width: '250px',
+                    value: 0,
+                    onValueChanged: function (e) {
+                        newShares = e.value;
+                    }
+                }),
+                $("<p />").text("Enter Date of Transaction: "),
+                $("<div />").attr("class", "center_horizontal").dxDateBox({
+                    width: '250px',
+                    value: purchaseDt,
+                    onValueChanged: function (e) {
+                        purchaseDt = e.value;
+                    }
+                }),
+                $("<div />").attr("class", "submit_btn").dxButton({
+                    stylingMode: "contained",
+                    text: "Confirm",
+                    type: "success",
+                    width: 200,
+                    onClick: function() {
+                        let confirmation = DevExpress.ui.dialog.confirm("Are you sure?", "Confirm");
+                        confirmation.done(function (dialogResult) {
+                            if (dialogResult) {
+                                $.ajax({
+                                    url: "/newTransaction",
+                                    type: "get",
+                                    data: {
+                                        ticker: newTicker,
+                                        buy_sell: buyOrSell,
+                                        price: newPrice,
+                                        shares: newShares,
+                                        dt: purchaseDt
+                                    },
+                                    success: function(response) {
+                                        if (response === 'success') {
+                                            DevExpress.ui.notify("Purchase Logged", "success", 500);
+                                            $("#popupContent").dxPopup("option", "visible", false);
+                                        }
+                                        else if (response === 'valid sell') {
+                                            DevExpress.ui.notify("Sale Logged", "success", 500);
+                                            $("#popupContent").dxPopup("option", "visible", false);
+                                        }
+                                        else if (response === 'no exist') {
+                                            DevExpress.ui.notify("Error: Ticker does not exist", "warning", 500);
+                                        }
+                                        else {
+                                            DevExpress.ui.notify("Error: Cannot sell more than you own", "warning", 500);
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        DevExpress.ui.notify("Error", "warning", 500);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }),
+            )
+        }
    });
    $("#single-selection").dxButtonGroup({
         items: timeSelections,

@@ -25,3 +25,19 @@
     min-width: 200px;
     float: left;
 }
+.purchase_style {
+    float: right;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+.center_horizontal {
+    margin: 0 auto;
+}
+.center_drop {
+    display: block;
+    margin: 10px auto 0;
+}
+.submit_btn {
+    margin: 10px auto 0 !important;
+    float: right;
+}

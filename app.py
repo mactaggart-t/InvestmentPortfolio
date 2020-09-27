@@ -10,6 +10,7 @@ from sql.add_security import add_security
 from sql.get_security_id import get_security_id, get_all_tickers
 from sql.get_historic_price import get_historic_price_db
 from sql.manage_users import user_taken, add_user, get_user_id, good_login
+from sql.manage_portfolios import check_valid_sell, add_purchase
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -81,6 +82,36 @@ def log_in():
 @app.route('/getUsername')
 def get_username():
     return session.get('username')
+
+
+@app.route('/newTransaction')
+def new_transaction():
+    user = get_user_id(session.get('username'))
+    ticker = request.args['ticker']
+    buy = request.args['buy_sell'] == "Buy"
+    price = request.args['price']
+    shares = int(request.args['shares'])
+    dt = request.args['dt']
+    dt = datetime.strptime(dt, '%a %b %d %Y %H:%M:%S GMT-0500 (Eastern Standard Time)').date()
+    sec_id = get_security_id(ticker)
+    if sec_id is None:
+        if ticker_exists(ticker):
+            add_security(ticker, get_name(ticker), get_sector(ticker),
+                         get_industry(ticker))
+            sec_id = get_security_id(ticker)
+            dates, prices = get_historic_data(ticker, datetime.today().timestamp(),
+                                              datetime(2000, 1, 1, 0, 0).timestamp())
+            add_historic_price(sec_id, prices, dates)
+        else:
+            return 'no exist'
+    if not buy:
+        if check_valid_sell(shares, sec_id, user, dt):
+            add_purchase(sec_id, user, dt, price, buy, shares)
+            return 'valid sell'
+        else:
+            return 'invalid sell'
+    add_purchase(sec_id, user, dt, price, buy, shares)
+    return 'success'
 
 
 @app.route('/getTickerInfo')
