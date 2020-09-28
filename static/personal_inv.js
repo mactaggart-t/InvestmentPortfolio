@@ -54,7 +54,7 @@ $(function() {
    });
    $("#viewSample").dxButton({
         stylingMode: "contained",
-        text: "View Sample",
+        text: "View Sample (Coming Soon)",
         type: "success",
         width: 250
    });

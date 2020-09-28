@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 from flask import Flask, render_template, jsonify, request, session
 from werkzeug.security import generate_password_hash
@@ -10,7 +10,7 @@ from sql.add_security import add_security
 from sql.get_security_id import get_security_id, get_all_tickers
 from sql.get_historic_price import get_historic_price_db
 from sql.manage_users import user_taken, add_user, get_user_id, good_login
-from sql.manage_portfolios import check_valid_sell, add_purchase
+from sql.manage_portfolios import check_valid_sell, add_purchase, get_port_secs, add_value, remove_anomolies
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -92,7 +92,7 @@ def new_transaction():
     price = request.args['price']
     shares = int(request.args['shares'])
     dt = request.args['dt']
-    dt = datetime.strptime(dt, '%a %b %d %Y %H:%M:%S GMT-0500 (Eastern Standard Time)').date()
+    dt = datetime.strptime(dt[0:15], '%a %b %d %Y').date()
     sec_id = get_security_id(ticker)
     if sec_id is None:
         if ticker_exists(ticker):
@@ -112,6 +112,26 @@ def new_transaction():
             return 'invalid sell'
     add_purchase(sec_id, user, dt, price, buy, shares)
     return 'success'
+
+
+@app.route('/loadPortfolio')
+def load_portfolio():
+    sec_ids = get_port_secs(session.get('user_id'))
+    portfolio_value = []
+    names = ["Portfolio Value"]
+    ticker = ["PORT"]
+    start_date = datetime.today().date()
+    end_date = date(2000, 1, 1)
+    delta = timedelta(days=1)
+    while start_date-delta >= end_date:
+        if start_date.weekday() != 5 and start_date.weekday() != 6:
+            portfolio_value.append({'date': start_date, 'price': 0})
+        start_date -= delta
+    for i in sec_ids:
+        portfolio_value = add_value(i, session.get('user_id'), end_date, portfolio_value)
+    portfolio_value = remove_anomolies(portfolio_value)
+    all_data = jsonify([names, ticker, [portfolio_value]])
+    return all_data
 
 
 @app.route('/getTickerInfo')

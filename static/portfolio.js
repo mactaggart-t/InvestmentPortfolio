@@ -78,6 +78,7 @@ function format_datasource(tickers, data_points){
 function get_base_prices(price_source, tickers, begin_dt) {
     begin_dt = new Date(begin_dt);
     let base_prices = [];
+    console.log(tickers);
     for (let i = 0; i < tickers.length; i++){
         let ticker = tickers[i];
         for (let j = 0; j < price_source.length; j++){
@@ -115,12 +116,38 @@ function format_series(tickers){
 }
 
 
+function load_portfolio() {
+    $.ajax({
+       url: "/loadPortfolio",
+       type: "get",
+       success: function(response) {
+           $("#securityGraph").dxChart("option", "dataSource", format_datasource(response[1], response[2]));
+           currentTickers = response[1];
+            if ($("#percent_dollar").dxButtonGroup("option", 'selectedItemKeys')[0] === "%") {
+                let base_price = get_base_prices(dataSource, currentTickers, current_start);
+                let copied_ds = JSON.parse(JSON.stringify(dataSource));
+                $("#securityGraph").dxChart("option", "dataSource", format_datasource_percent(base_price, copied_ds,
+                    currentTickers));
+            }
+            $("#securityGraph").dxChart("option", "series", format_series(response[1]));
+            $("#securityGraph").dxChart("option", "title", {'text': response[0]});
+            $("#securityGraph").dxChart("option", "valueAxis", {'title': 'Price($)'})
+       },
+   });
+}
+
+
 $(function() {
    get_username();
    $("#itemSelection").dxSelectBox({
-        items: ['Portfolio Balance', 'Individual Securities', 'Portfolio Diversification'],
-        placeholder: 'Select a view',
-        width: 250
+       items: ['Portfolio Balance', 'Individual Securities(coming soon)', 'Portfolio Diversification(coming soon)'],
+       placeholder: 'Select a view',
+       width: 250,
+       onItemClick: function (e) {
+           if (e.itemData === 'Portfolio Balance') {
+               load_portfolio()
+           }
+       }
    });
    $("#buySell").dxButton({
        stylingMode: "contained",
@@ -206,6 +233,7 @@ $(function() {
                                         if (response === 'success') {
                                             DevExpress.ui.notify("Purchase Logged", "success", 500);
                                             $("#popupContent").dxPopup("option", "visible", false);
+                                            load_portfolio()
                                         }
                                         else if (response === 'valid sell') {
                                             DevExpress.ui.notify("Sale Logged", "success", 500);
@@ -307,11 +335,11 @@ $(function() {
             size: 2
         },
         legend: {
-            visible: true,
+            visible: false,
         },
         argumentAxis: {
             argumentType: "datetime",
-            title: 'Date'
+            title: 'Date',
         },
         valueAxis: {
             position: "right",
