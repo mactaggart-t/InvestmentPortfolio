@@ -5,15 +5,12 @@
         <title>{% block title %}Default title{% endblock title %}</title>
         <link rel="stylesheet" type="text/css" href="/static/base_styles.css">
         <link rel="shortcut icon" href="/static/favicon.ico">
-        {%  block stylesheet %} {% endblock stylesheet %}
+        {% block stylesheet %} {% endblock stylesheet %}
         {% block scripts %} {% endblock scripts %}
     </head>
     <body>
         <ul>
-            <li><a class="active" href="personalInv">Personal Investments</a></li>
-            <li><a href="s_and_p">S&P 500</a></li>
-            <li><a href="research">Research Securities</a></li>
-            <li style="float:right"><a href="about">About</a></li>
+            {% block list_elems %} {% endblock list_elems %}
         </ul>
         {% block content %}{% endblock content %}
     </body>

@@ -54,8 +54,30 @@ $(function() {
    });
    $("#viewSample").dxButton({
         stylingMode: "contained",
-        text: "View Sample (Coming Soon)",
+        text: "View Sample",
         type: "success",
-        width: 250
+        width: 250,
+        onClick: function () {
+            $.ajax({
+                url: "/signIn",
+                type: "get",
+                data: {
+                    username: 'Sample',
+                    password: 'pass'
+                },
+                success: function(response) {
+                    if (response === 'success') {
+                        window.location.href = 'portfolio';
+                    }
+                    else {
+                        DevExpress.ui.notify("Error: Incorrect Username or Password", "warning", 500);
+                    }
+                },
+                error: function(xhr) {
+                    DevExpress.ui.notify("Error", "warning", 500);
+                }
+            });
+        }
+
    });
 });

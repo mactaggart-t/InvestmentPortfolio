@@ -18,7 +18,7 @@ app.secret_key = 'test'
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('research.html')
 
 
 @app.route('/personalInv')
@@ -86,7 +86,9 @@ def get_username():
 
 @app.route('/newTransaction')
 def new_transaction():
-    user = get_user_id(session.get('username'))
+    if session.get('username') == 'Sample':
+        return 'no sample'
+    user = session.get('user_id')
     ticker = request.args['ticker']
     buy = request.args['buy_sell'] == "Buy"
     price = request.args['price']
@@ -148,8 +150,8 @@ def get_price():
             if ticker_exists(ticker_name[i]):
                 add_security(ticker_name[i], get_name(ticker_name[i]), get_sector(ticker_name[i]),
                              get_industry(ticker_name[i]))
-                sec_id[i] = get_security_id(ticker_name)
-                dates, prices = get_historic_data(ticker_name, datetime.today().timestamp(),
+                sec_id[i] = get_security_id(ticker_name[i])
+                dates, prices = get_historic_data(ticker_name[i], datetime.today().timestamp(),
                                                   datetime(2000, 1, 1, 0, 0).timestamp())
                 add_historic_price(sec_id[i], prices, dates)
             else:

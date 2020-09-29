@@ -103,6 +103,7 @@ $(function() {
     $("#searchBox").dxTagBox({
         items: get_all_tickers(),
         acceptCustomValue: true,
+        searchEnabled: true,
         onValueChanged: function(e) {
             currentTickers = e.value;
         }

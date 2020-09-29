@@ -242,6 +242,9 @@ $(function() {
                                         else if (response === 'no exist') {
                                             DevExpress.ui.notify("Error: Ticker does not exist", "warning", 500);
                                         }
+                                        else if (response === 'no sample') {
+                                            DevExpress.ui.notify("Error: Cannot add to sample", "warning", 500);
+                                        }
                                         else {
                                             DevExpress.ui.notify("Error: Cannot sell more than you own", "warning", 500);
                                         }
