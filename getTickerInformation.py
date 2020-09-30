@@ -7,6 +7,7 @@ import os
 import calendar
 import time
 import sys
+from sys import platform
 
 
 def get_security_price(ticker):
@@ -20,7 +21,12 @@ def get_security_price(ticker):
 def get_historic_data(ticker, end_dt, begin_dt=datetime(1980, 1, 1, 0, 0).timestamp()):
     dates = []
     close_prices = []
-    chromedriver = os.path.join(sys.path[0], 'chromedriver 2')
+    if platform == "linux":
+        chromedriver = os.path.join(sys.path[0], 'chromedriver 2 linux')
+    elif platform == "darwin":
+        chromedriver = os.path.join(sys.path[0], 'chromedriver 2 mac')
+    else:
+        chromedriver = os.path.join(sys.path[0], 'chromedriver.exe')
     os.environ["webdriver.chrome.driver"] = chromedriver
     options = Options()
     options.headless = True
