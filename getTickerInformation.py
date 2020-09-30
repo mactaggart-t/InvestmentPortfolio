@@ -2,9 +2,11 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from datetime import datetime, date
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import os
 import calendar
 import time
+import sys
 
 
 def get_security_price(ticker):
@@ -18,9 +20,11 @@ def get_security_price(ticker):
 def get_historic_data(ticker, end_dt, begin_dt=datetime(1980, 1, 1, 0, 0).timestamp()):
     dates = []
     close_prices = []
-    chromrdriver = '/Users/thomasmactaggart/Desktop/chromedriver 2'
-    os.environ["webdriver.chrome.driver"] = chromrdriver
-    driver = webdriver.Chrome(chromrdriver)
+    chromedriver = os.path.join(sys.path[0], 'chromedriver 2')
+    os.environ["webdriver.chrome.driver"] = chromedriver
+    options = Options()
+    options.headless = True
+    driver = webdriver.Chrome(executable_path=chromedriver, options=options)
     url = 'https://finance.yahoo.com/quote/' + ticker + '/history?period1=' + str(int(begin_dt)) + '&period2=' + \
           str(int(end_dt)) + '&interval=1d&filter=history&frequency=1d'
     num_scrolls = int((end_dt-begin_dt)/(86400*50))
