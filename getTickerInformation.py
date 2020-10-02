@@ -27,11 +27,9 @@ def get_historic_data(ticker, end_dt, begin_dt=datetime(1980, 1, 1, 0, 0).timest
         chromedriver = os.path.join(sys.path[0], 'chromedriver 2 mac')
     else:
         chromedriver = os.path.join(sys.path[0], 'chromedriver.exe')
-    chrome_path = os.path.join(sys.path[0], 'Google Chrome')
     os.environ["webdriver.chrome.driver"] = chromedriver
     options = Options()
     options.headless = True
-    options.binary_location = chrome_path
     driver = webdriver.Chrome(executable_path=chromedriver, options=options)
     url = 'https://finance.yahoo.com/quote/' + ticker + '/history?period1=' + str(int(begin_dt)) + '&period2=' + \
           str(int(end_dt)) + '&interval=1d&filter=history&frequency=1d'
