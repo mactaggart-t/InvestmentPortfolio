@@ -17,9 +17,9 @@ def check_valid_sell(shares, sec_id, username_id, sell_dt):
         bought_shares = 0
         sold_shares = 0
         for i in all_transactions:
-            if i[2] == sec_id and i[3] >= sell_dt and bool(i[6]):
+            if i[2] == sec_id and bool(i[6]):
                 bought_shares = bought_shares + i[5]
-            elif i[2] == sec_id and i[3] >= sell_dt and not bool(i[6]):
+            elif i[2] == sec_id and not bool(i[6]):
                 sold_shares = sold_shares + i[5]
         return bought_shares >= sold_shares + shares
     except Error as error:

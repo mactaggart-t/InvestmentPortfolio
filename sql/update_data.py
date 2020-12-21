@@ -76,7 +76,7 @@ def get_historic_data(ticker, end_dt, begin_dt=datetime(1980, 1, 1, 0, 0).timest
         if platform == "linux":
             chromedriver = os.path.join(sys.path[0], 'chromedriver/chromedriver 2 linux')
         elif platform == "darwin":
-            chromedriver = os.path.join(sys.path[0], 'chromedriver/chromedriver 2 mac')
+            chromedriver = os.path.join(sys.path[0], 'chromedriver/chromedriver 3')
         else:
             chromedriver = os.path.join(sys.path[0], 'chromedriver/chromedriver.exe')
         os.environ["webdriver.chrome.driver"] = chromedriver

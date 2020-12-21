@@ -1,5 +1,6 @@
 let currentTickers = {};
 let dataSource = [{}];
+let gridDataSource = [{}];
 let today = new Date();
 let all_date = new Date('Jan 1, 2000');
 let current_start = all_date;
@@ -16,6 +17,7 @@ let timeSelections = [
 let newTicker = '';
 let newPrice = 0;
 let newShares = 0;
+let base_price = 0;
 let purchaseDt = new Date();
 let buyOrSell = "Buy";
 
@@ -75,23 +77,14 @@ function format_datasource(tickers, data_points){
 }
 
 
-function get_base_prices(price_source, tickers, begin_dt) {
-    begin_dt = new Date(begin_dt);
-    let base_prices = [];
-    console.log(tickers);
-    for (let i = 0; i < tickers.length; i++){
-        let ticker = tickers[i];
-        for (let j = 0; j < price_source.length; j++){
-            if (new Date(price_source[j]['date']) < begin_dt || price_source[j][ticker] === undefined){
-                base_prices.push(price_source[j-1][ticker]);
-                break;
-            }
-            else if(j === price_source.length -1){
-                base_prices.push(price_source[price_source.length-1][ticker])
-            }
-        }
-    }
-    return base_prices
+function get_base_prices() {
+    $.ajax({
+       url: "/getTotalPurchase",
+       type: "get",
+       success: function(response) {
+           base_price = response['purchase'];
+       },
+   });
 }
 
 function format_datasource_percent(base_price, price_source, tickers) {
@@ -99,7 +92,14 @@ function format_datasource_percent(base_price, price_source, tickers) {
         let ticker = tickers[j].toString();
         for (let i = 0; i < price_source.length; i++){
             if (price_source[i][ticker] !== undefined){
-                price_source[i][ticker] = (price_source[i][ticker]-base_price[j])/base_price[j]
+                let current_base = base_price[0];
+                for (let k = 0; k < base_price.length; k++){
+                    if (new Date(price_source[i]['date']) >= new Date(base_price[k]['date']) &&
+                        new Date(base_price[k]['date']) > new Date(current_base['date'])) {
+                        current_base = base_price[k];
+                    }
+                }
+                price_source[i][ticker] = (price_source[i][ticker]-current_base['price'])/current_base['price'];
             }
         }
     }
@@ -116,22 +116,38 @@ function format_series(tickers){
 }
 
 
+function load_portfolio_datagrid() {
+    $("#securityGrid").dxDataGrid("option", "visible", true);
+    $.ajax({
+       url: "/loadPortfolioDataGrid",
+       type: "get",
+       success: function(response) {
+           $("#securityGrid").dxDataGrid("option", "dataSource", response);
+           $("#toastContainer").dxToast("hide");
+
+       },
+   });
+}
+
+
 function load_portfolio() {
     $.ajax({
        url: "/loadPortfolio",
        type: "get",
        success: function(response) {
+           $("#securityGraph").show();
+           $("#percent_dollar").show();
+           $("#single-selection").show();
            $("#securityGraph").dxChart("option", "dataSource", format_datasource(response[1], response[2]));
            currentTickers = response[1];
             if ($("#percent_dollar").dxButtonGroup("option", 'selectedItemKeys')[0] === "%") {
-                let base_price = get_base_prices(dataSource, currentTickers, current_start);
                 let copied_ds = JSON.parse(JSON.stringify(dataSource));
                 $("#securityGraph").dxChart("option", "dataSource", format_datasource_percent(base_price, copied_ds,
                     currentTickers));
             }
             $("#securityGraph").dxChart("option", "series", format_series(response[1]));
             $("#securityGraph").dxChart("option", "title", {'text': response[0]});
-            $("#securityGraph").dxChart("option", "valueAxis", {'title': 'Price($)'})
+            $("#securityGraph").dxChart("option", "valueAxis", {'title': 'Price($)'});
        },
    });
 }
@@ -139,13 +155,25 @@ function load_portfolio() {
 
 $(function() {
    get_username();
+   get_base_prices();
    $("#itemSelection").dxSelectBox({
-       items: ['Portfolio Balance', 'Individual Securities(coming soon)', 'Portfolio Diversification(coming soon)'],
+       items: ['Portfolio Balance', 'Transaction History(coming soon)', 'Individual Securities(coming soon)', 'Portfolio Diversification(coming soon)'],
        placeholder: 'Select a view',
        width: 250,
        onItemClick: function (e) {
            if (e.itemData === 'Portfolio Balance') {
-               load_portfolio()
+               $("#toastContainer").dxToast("show");
+               load_portfolio();
+               load_portfolio_datagrid();
+           }
+           else if(e.itemData === 'Transaction History(coming soon)') {
+               $.ajax({
+                   url: "/loadENPH",
+                   type: "get",
+                   success: function(response) {
+
+                   },
+               });
            }
        }
    });
@@ -233,7 +261,8 @@ $(function() {
                                         if (response === 'success') {
                                             DevExpress.ui.notify("Purchase Logged", "success", 500);
                                             $("#popupContent").dxPopup("option", "visible", false);
-                                            load_portfolio()
+                                            load_portfolio();
+                                            load_portfolio_datagrid();
                                         }
                                         else if (response === 'valid sell') {
                                             DevExpress.ui.notify("Sale Logged", "success", 500);
@@ -275,7 +304,6 @@ $(function() {
                 current_start = all_dt
             }
             if ($("#percent_dollar").dxButtonGroup("option", 'selectedItemKeys')[0] === "%"){
-                let base_price = get_base_prices(dataSource, currentTickers, current_start);
                 let copied_ds = JSON.parse(JSON.stringify(dataSource));
                 $("#securityGraph").dxChart("option", "dataSource", format_datasource_percent(base_price, copied_ds,
                     currentTickers));
@@ -290,7 +318,6 @@ $(function() {
        selectedItemKeys: ['$'],
        onItemClick: function (e) {
            if (e.itemData.text === '%'){
-               let base_price = get_base_prices(dataSource, currentTickers, current_start);
                let copied_ds = JSON.parse(JSON.stringify(dataSource));
                $("#securityGraph").dxChart("option", "dataSource", format_datasource_percent(base_price, copied_ds,
                    currentTickers));
@@ -308,6 +335,7 @@ $(function() {
    });
    $("#securityGraph").dxChart({
         dataSource: dataSource,
+        visible: false,
         title: {
             text: "",
         },
@@ -349,6 +377,69 @@ $(function() {
             label: {
                 format: 'currency'
             }
-        }
+        },
    });
+   $("#securityGrid").dxDataGrid({
+       dataSource: gridDataSource,
+       visible: false,
+       columns: [{
+           dataField: 'Company',
+           dataType: "string",
+       }, {
+           dataField: 'Ticker',
+           dataType: "string"
+       }, {
+           dataField: 'PurchasePrice',
+           dataType: "number",
+           format: {
+               type: 'currency',
+               precision: 2,
+               currency: 'USD'
+           },
+       }, {
+           dataField: 'Shares',
+           dataType: "number"
+       }, {
+           dataField: 'CurrentPrice',
+           dataType: "number",
+           format: {
+               type: 'currency',
+               precision: 2,
+               currency: 'USD'
+           },
+       }, {
+           dataField: 'MarketValue',
+           dataType: "number",
+           format: {
+               type: 'currency',
+               precision: 2,
+               currency: 'USD'
+           },
+       }, {
+           dataField: 'Gain$',
+           dataType: "number",
+           format: {
+               type: 'currency',
+               precision: 2,
+               currency: 'USD'
+           },
+       }, {
+           dataField: 'Gain%',
+           dataType: "number",
+           format: {
+               type: 'percent',
+               precision: 2,
+           },
+       }],
+       showBorders: true,
+       showRowLines: true,
+   });
+   $("#toastContainer").dxToast({
+        message: "Processing...",
+        type: "success",
+        displayTime: 100000,
+    });
+   $("#single-selection").hide();
+   $("#percent_dollar").hide();
+   $("#securityGraph").hide();
 });

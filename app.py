@@ -9,6 +9,7 @@ from sql.get_historic_price import get_historic_price_db
 from sql.manage_users import user_taken, add_user, get_user_id, good_login
 from sql.manage_portfolios import check_valid_sell, add_purchase, get_port_secs, add_value, remove_anomolies
 from sql.update_data import manage_updates, get_historic_data, add_historic_price, get_security_id, get_all_tickers
+from sql.get_security_id import get_ticker_from_id, get_name_from_id, get_purchase, get_price_today, get_purchases
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -132,6 +133,38 @@ def load_portfolio():
     portfolio_value = remove_anomolies(portfolio_value)
     all_data = jsonify([names, ticker, [portfolio_value]])
     return all_data
+
+
+@app.route('/loadPortfolioDataGrid')
+def get_portfolio():
+    sec_ids = get_port_secs(session.get('user_id'))
+    data = []
+    for i in sec_ids:
+        name = get_name_from_id(i)
+        ticker = get_ticker_from_id(i)
+        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        current_price = get_price_today(i)
+        if shares <= 0:
+            continue
+        data.append(
+            {"Company": name,
+             "Ticker": ticker,
+             "PurchasePrice": purchase_price,
+             "Shares": shares,
+             "CurrentPrice": current_price,
+             "MarketValue": current_price*shares,
+             "Gain$": (current_price-purchase_price)*shares,
+             "Gain%": (current_price-purchase_price)*shares/(purchase_price*shares)
+             }
+        )
+    return jsonify(data)
+
+
+@app.route('/getTotalPurchase')
+def get_total_purchase():
+    user_id = (session.get('user_id'))
+    daily_purchase = get_purchases(user_id)
+    return jsonify({'purchase': daily_purchase})
 
 
 @app.route('/getTickerInfo')

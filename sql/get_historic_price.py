@@ -1,5 +1,6 @@
 from mysql.connector import Error
 import pymysql
+from datetime import date
 
 
 def get_historic_price_db(sec_id):
@@ -14,10 +15,12 @@ def get_historic_price_db(sec_id):
                                    WHERE sec_id = %s"""
 
         cursor.execute(sql_insert_query, (sec_id,))
-        data = cursor.fetchall()
+        data = list(cursor.fetchall())
         formated_data = []
+        data.reverse()
         for i in data:
-            formated_data.append({'date': i[0], 'price': i[1]})
+            if not any(d['date'] == i[0] for d in formated_data):
+                formated_data.append({'date': i[0], 'price': i[1]})
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:

@@ -41,19 +41,39 @@ function get_all_tickers(){
 }
 
 
-function format_datasource(tickers, data_points){
-    let formatted_data = [];
-    for (let j = 0; j < tickers.length; j++){
-        for (let i = 0; i < data_points[j].length; i++){
-            let ticker = tickers[j].toString();
-            if (formatted_data[i] === undefined){
-                formatted_data.push({})
-            }
-            formatted_data[i][ticker] = data_points[j][i]['price'];
-            formatted_data[i]['date'] = data_points[j][i]['date'];
+function find_date(date, formatted_data) {
+    for (let i = 0; i < formatted_data.length; i++) {
+        if (formatted_data[i]['date'] === date) {
+            return i;
         }
     }
-    all_date = formatted_data[formatted_data.length-1]['date'];
+    return -1;
+}
+
+
+function format_datasource(tickers, data_points){
+    let formatted_data = [];
+    let current_all = new Date(today);
+    for (let j = 0; j < tickers.length; j++){
+        let ticker = tickers[j].toString();
+        for (let i = 0; i < data_points[j].length; i++){
+            let index = find_date(data_points[j][i]['date'], formatted_data);
+            if (index === -1){
+                formatted_data.push({ticker: data_points[j][i]['price'],
+                'date': data_points[j][i]['date']});
+                formatted_data[i][ticker] = data_points[j][i]['price'];
+                formatted_data[i]['date'] = data_points[j][i]['date'];
+            }
+            else {
+                formatted_data[index][ticker] = data_points[j][i]['price'];
+                formatted_data[index]['date'] = data_points[j][i]['date'];
+            }
+            if (new Date(data_points[j][i]['date']) < current_all) {
+                current_all = new Date(data_points[j][i]['date']);
+            }
+        }
+    }
+    all_date = current_all;
     dataSource = formatted_data;
     return formatted_data
 }
@@ -64,15 +84,19 @@ function get_base_prices(price_source, tickers, begin_dt) {
     let base_prices = [];
     for (let i = 0; i < tickers.length; i++){
         let ticker = tickers[i];
+        let closest_dt = new Date(price_source[0]['date']);
+        let temp_base = price_source[0][ticker];
         for (let j = 0; j < price_source.length; j++){
-            if (new Date(price_source[j]['date']) < begin_dt || price_source[j][ticker] === undefined){
-                base_prices.push(price_source[j-1][ticker]);
+            if (new Date(price_source[j]['date']) === begin_dt){
+                temp_base = price_source[j][ticker];
                 break;
             }
-            else if(j === price_source.length -1){
-                base_prices.push(price_source[price_source.length-1][ticker])
+            else if(new Date(price_source[j]['date']) > begin_dt && new Date(price_source[j]['date']) < closest_dt) {
+                closest_dt = new Date(price_source[j]['date']);
+                temp_base = price_source[j][ticker];
             }
         }
+        base_prices.push(temp_base);
     }
     return base_prices
 }
@@ -93,7 +117,7 @@ function format_datasource_percent(base_price, price_source, tickers) {
 function format_series(tickers){
     let formatted_series = [];
     for (let i = 0; i < tickers.length; i++){
-        formatted_series.push({valueField: tickers[i], name: tickers[i]})
+        formatted_series.push({valueField: tickers[i], name: tickers[i]});
     }
     return formatted_series
 }
@@ -114,6 +138,7 @@ $(function() {
         type: "default",
         width: 120,
         onClick: function() {
+            $("#toastContainer").dxToast("show");
             $.ajax({
                 url: "/getTickerInfo",
                 type: "get",
@@ -135,6 +160,7 @@ $(function() {
                         $("#securityGraph").dxChart("option", "title", {'text': response[0]});
                         $("#securityGraph").dxChart("option", "valueAxis", {'title': 'Price($)'})
                     }
+                    $("#toastContainer").dxToast("hide");
                 },
                 error: function(xhr) {
                     DevExpress.ui.notify("Error", "warning", 500);
@@ -233,4 +259,9 @@ $(function() {
             }
         }
    });
+   $("#toastContainer").dxToast({
+        message: "Processing...",
+        type: "success",
+        displayTime: 100000,
+    });
 });
