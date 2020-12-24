@@ -1,5 +1,5 @@
 from mysql.connector import Error
-from datetime import datetime, date
+from datetime import datetime
 import pymysql
 
 

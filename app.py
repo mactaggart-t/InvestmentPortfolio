@@ -8,8 +8,11 @@ from sql.add_security import add_security
 from sql.get_historic_price import get_historic_price_db
 from sql.manage_users import user_taken, add_user, get_user_id, good_login
 from sql.manage_portfolios import check_valid_sell, add_purchase, get_port_secs, add_value, remove_anomolies
-from sql.update_data import manage_updates, get_historic_data, add_historic_price, get_security_id, get_all_tickers
-from sql.get_security_id import get_ticker_from_id, get_name_from_id, get_purchase, get_price_today, get_purchases
+from sql.update_data import get_historic_data, add_historic_price, get_security_id, get_all_tickers
+from sql.get_security_id import (get_ticker_from_id, get_name_from_id, get_purchase, get_price_today, get_purchases,
+                                 get_sector_from_id)
+from sql.transaction_history import get_transaction_history
+from sql.get_basic_info import get_all_sectors, sector_conversion
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -160,6 +163,50 @@ def get_portfolio():
     return jsonify(data)
 
 
+@app.route('/loadTransactionHistory')
+def load_transaction_history():
+    user_id = (session.get('user_id'))
+    data = get_transaction_history(user_id)
+    return jsonify(data)
+
+
+@app.route('/loadSecDistribution')
+def load_sec_distribution():
+    sec_ids = get_port_secs(session.get('user_id'))
+    data = []
+    total_price = 0
+    for i in sec_ids:
+        ticker = get_ticker_from_id(i)
+        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        current_price = get_price_today(i)
+        if shares <= 0:
+            continue
+        data.append({
+            'ticker': ticker,
+            'value': current_price * shares
+        })
+        total_price = total_price + (current_price * shares)
+    data = sorted(data, key=lambda item: item["value"])
+    return jsonify([data, total_price])
+
+
+@app.route('/loadSectorDistribution')
+def load_sector_distribution():
+    sectors = get_all_sectors()
+    sec_ids = get_port_secs(session.get('user_id'))
+    for i in sec_ids:
+        sector = get_sector_from_id(i)
+        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        current_price = get_price_today(i)
+        if shares <= 0:
+            continue
+        for j in sectors:
+            if j["sector"] == sector_conversion(sector):
+                j["value"] = j["value"] + current_price * shares
+    sectors = sorted(sectors, key=lambda item: item["value"])
+    return jsonify(sectors)
+
+
 @app.route('/getTotalPurchase')
 def get_total_purchase():
     user_id = (session.get('user_id'))
@@ -173,9 +220,10 @@ def get_price():
     sec_id = []
     names = []
     data = []
+
     for i in ticker_name:
         sec_id.append(get_security_id(i))
-        names.append(get_name(i))
+        names.append(get_name_from_id(sec_id[-1]))
     for i in range(0, len(sec_id)):
         if sec_id[i] is None:
             if ticker_exists(ticker_name[i]):
@@ -195,24 +243,7 @@ def get_price():
 @app.route('/getSecurityChart')
 def get_chart():
     ticker_name = request.args['ticker_name']
-    start_dt = request.args['start_dt']
-    end_dt = request.args['end_dt']
     return get_historic_data(ticker_name, datetime(2016, 1, 19, 0, 0).timestamp(), datetime.today().timestamp())
-
-
-@app.route('/loadSAndP')
-def load_s_and_p():
-    manage_updates()
-    """unfilled_tickers = get_unfilled_tickers()
-    for i in unfilled_tickers:
-        sec_id = get_security_id(i)
-        if not_in_db(sec_id):
-            print(i)
-            dates, prices = get_historic_data(i.replace('.', '-'), datetime.today().timestamp(),
-                                              datetime(2000, 1, 1, 0, 0).timestamp())
-            add_historic_price(sec_id, prices, dates)"""
-
-    return 'Success'
 
 
 if __name__ == '__main__':

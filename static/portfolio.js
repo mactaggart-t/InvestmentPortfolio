@@ -1,6 +1,10 @@
 let currentTickers = {};
 let dataSource = [{}];
 let gridDataSource = [{}];
+let transactDataSource = [{}];
+let secDistDataSource = [{}];
+let sectorDistDataSource = [{}];
+let portfolioValue = 0;
 let today = new Date();
 let all_date = new Date('Jan 1, 2000');
 let current_start = all_date;
@@ -33,21 +37,6 @@ function deltaDate(input, days, months, years) {
     );
 }
 
-
-function get_all_tickers(){
-    $.ajax({
-        url: "/getAllTickers",
-        type: "get",
-        success: function(response) {
-            $("#searchBox").dxTagBox('option', 'items', response);
-        },
-        error: function(xhr) {
-            DevExpress.ui.notify("Error", "warning", 500);
-        }
-    });
-}
-
-
 function get_username() {
     $.ajax({
         url: "/getUsername",
@@ -57,7 +46,6 @@ function get_username() {
         },
     });
 }
-
 
 function format_datasource(tickers, data_points){
     let formatted_data = [];
@@ -75,7 +63,6 @@ function format_datasource(tickers, data_points){
     dataSource = formatted_data;
     return formatted_data
 }
-
 
 function get_base_prices() {
     $.ajax({
@@ -106,7 +93,6 @@ function format_datasource_percent(base_price, price_source, tickers) {
     return price_source
 }
 
-
 function format_series(tickers){
     let formatted_series = [];
     for (let i = 0; i < tickers.length; i++){
@@ -115,29 +101,35 @@ function format_series(tickers){
     return formatted_series
 }
 
-
 function load_portfolio_datagrid() {
-    $("#securityGrid").dxDataGrid("option", "visible", true);
     $.ajax({
        url: "/loadPortfolioDataGrid",
        type: "get",
        success: function(response) {
+           gridDataSource = response;
            $("#securityGrid").dxDataGrid("option", "dataSource", response);
            $("#toastContainer").dxToast("hide");
-
        },
    });
 }
 
+function load_transaction_history() {
+    $.ajax({
+       url: "/loadTransactionHistory",
+       type: "get",
+       success: function(response) {
+           transactDataSource = response;
+           $("#transactionHistory").dxDataGrid("option", "dataSource", response);
+           $("#toastContainer").dxToast("hide");
+       },
+   });
+}
 
 function load_portfolio() {
     $.ajax({
        url: "/loadPortfolio",
        type: "get",
        success: function(response) {
-           $("#securityGraph").show();
-           $("#percent_dollar").show();
-           $("#single-selection").show();
            $("#securityGraph").dxChart("option", "dataSource", format_datasource(response[1], response[2]));
            currentTickers = response[1];
             if ($("#percent_dollar").dxButtonGroup("option", 'selectedItemKeys')[0] === "%") {
@@ -148,32 +140,85 @@ function load_portfolio() {
             $("#securityGraph").dxChart("option", "series", format_series(response[1]));
             $("#securityGraph").dxChart("option", "title", {'text': response[0]});
             $("#securityGraph").dxChart("option", "valueAxis", {'title': 'Price($)'});
+            $("#toastContainer").dxToast("hide");
        },
    });
 }
 
+function load_sec_distribution() {
+    $.ajax({
+       url: "/loadSecDistribution",
+       type: "get",
+       success: function(response) {
+           secDistDataSource = response[0];
+           portfolioValue = response[1];
+           $("#secDistribution").dxPieChart("option", "dataSource", response[0]);
+           $("#toastContainer").dxToast("hide");
+       },
+   });
+}
+
+function load_sector_distribution() {
+    $.ajax({
+       url: "/loadSectorDistribution",
+       type: "get",
+       success: function(response) {
+           secDistDataSource = response;
+           $("#sectorDistribution").dxPieChart("option", "dataSource", response);
+           $("#toastContainer").dxToast("hide");
+       },
+   });
+}
+
+function hide_all() {
+    $("#securityGraph").hide();
+    $("#percent_dollar").hide();
+    $("#single-selection").hide();
+    $("#secDistribution").hide();
+    $("#sectorDistribution").hide();
+    $("#securityGrid").dxDataGrid("option", "visible", false);
+    $("#transactionHistory").dxDataGrid("option", "visible", false);
+}
 
 $(function() {
    get_username();
    get_base_prices();
    $("#itemSelection").dxSelectBox({
-       items: ['Portfolio Balance', 'Transaction History(coming soon)', 'Individual Securities(coming soon)', 'Portfolio Diversification(coming soon)'],
+       items: ['Portfolio Balance', 'Transaction History', 'Individual Securities(coming soon)', 'Portfolio Diversification'],
        placeholder: 'Select a view',
        width: 250,
        onItemClick: function (e) {
            if (e.itemData === 'Portfolio Balance') {
-               $("#toastContainer").dxToast("show");
-               load_portfolio();
-               load_portfolio_datagrid();
-           }
-           else if(e.itemData === 'Transaction History(coming soon)') {
-               $.ajax({
-                   url: "/loadENPH",
-                   type: "get",
-                   success: function(response) {
+               hide_all();
+               $("#securityGraph").show();
+               $("#percent_dollar").show();
+               $("#single-selection").show();
+               $("#securityGrid").dxDataGrid("option", "visible", true);
+               if (dataSource.length === 1 || gridDataSource.length === 1) {
+                   $("#toastContainer").dxToast("show");
+                   load_portfolio();
+                   load_portfolio_datagrid();
+               }
 
-                   },
-               });
+           }
+           else if(e.itemData === 'Transaction History') {
+               hide_all();
+               $("#transactionHistory").dxDataGrid("option", "visible", true);
+               if (transactDataSource.length === 1) {
+                   $("#toastContainer").dxToast("show");
+                   load_transaction_history();
+               }
+           }
+           else if(e.itemData === 'Portfolio Diversification') {
+               hide_all();
+               $("#secDistribution").show();
+               $("#sectorDistribution").show();
+               if (secDistDataSource.length === 1) {
+                   $("#toastContainer").dxToast("show");
+                   load_sec_distribution();
+                   load_sector_distribution();
+               }
+
            }
        }
    });
@@ -434,12 +479,131 @@ $(function() {
        showBorders: true,
        showRowLines: true,
    });
+   $("#transactionHistory").dxDataGrid({
+       dataSource: transactDataSource,
+       visible: false,
+       columns: [{
+           dataField: 'Company',
+           dataType: "string",
+       }, {
+           dataField: 'Ticker',
+           dataType: "string"
+       }, {
+           dataField: 'PurchaseOrSale',
+           dataType: "string"
+       }, {
+           dataField: 'PurchaseOrSalePrice',
+           dataType: "number",
+           format: {
+               type: 'currency',
+               precision: 2,
+               currency: 'USD'
+           },
+       }, {
+           dataField: 'Shares',
+           dataType: "number"
+       }, {
+           dataField: 'PurchaseOrSaleDate',
+           dataType: "date",
+           format: {
+               type: "shortDate"
+           }
+       }],
+       showBorders: true,
+       showRowLines: true,
+   });
    $("#toastContainer").dxToast({
         message: "Processing...",
         type: "success",
         displayTime: 100000,
     });
-   $("#single-selection").hide();
-   $("#percent_dollar").hide();
-   $("#securityGraph").hide();
+   $("#secDistribution").dxPieChart({
+        palette: "bright",
+        dataSource: secDistDataSource,
+        legend: {
+            horizontalAlignment: "left"
+        },
+        minDiameter: .85,
+        series: [
+            {
+                argumentField: "ticker",
+                valueField: "value",
+                label: {
+                    visible: true,
+                    format: {
+                        type: 'currency',
+                        precision: 2,
+                        currency: 'USD'
+                    },
+                    connector: {
+                        visible: true,
+                        width: 1
+                    }
+                }
+            },
+        ],
+        tooltip: {
+            enabled: false,
+            customizeTooltip: function(arg) {
+                let curVal = parseInt(arg.valueText.replace(",", ""));
+                return {
+                    text: arg.argumentText + "<br/>" + (curVal * 100 / portfolioValue).toFixed(2)+"%"
+                };
+            }
+        },
+        onPointHoverChanged: function(arg){
+            if (arg.target.isHovered()) {
+                arg.target.showTooltip();
+            } else {
+                arg.target.hideTooltip();
+            }
+
+        },
+        title: "Security Distribution"
+   });
+   $("#sectorDistribution").dxPieChart({
+        palette: "bright",
+        dataSource: sectorDistDataSource,
+        legend: {
+            horizontalAlignment: "left"
+        },
+        minDiameter: .85,
+        series: [
+            {
+                argumentField: "sector",
+                valueField: "value",
+                label: {
+                    visible: true,
+                    format: {
+                        type: 'currency',
+                        precision: 2,
+                        currency: 'USD'
+                    },
+                    connector: {
+                        visible: true,
+                        width: 1
+                    }
+                }
+            },
+        ],
+        tooltip: {
+            enabled: false,
+            customizeTooltip: function(arg) {
+                let curVal = parseInt(arg.valueText.replace(",", ""));
+                return {
+                    text: arg.argumentText + "<br/>" + (curVal * 100 / portfolioValue).toFixed(2)+"%"
+                };
+            }
+        },
+        onPointHoverChanged: function(arg){
+            if (arg.target.isHovered()) {
+                arg.target.showTooltip();
+            } else {
+                arg.target.hideTooltip();
+            }
+
+        },
+        title: "Sector Distribution"
+    });
+   hide_all()
 });

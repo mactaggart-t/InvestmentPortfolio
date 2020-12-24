@@ -1,6 +1,6 @@
 from mysql.connector import Error
 import pymysql
-from datetime import date
+import time
 
 
 def get_historic_price_db(sec_id):
@@ -11,7 +11,7 @@ def get_historic_price_db(sec_id):
                                             passwd='InvestPortPass')
 
         cursor = connection_hosted.cursor()
-        sql_insert_query = """SELECT record_dt, close_price FROM historic_data
+        sql_insert_query = """SELECT DISTINCT record_dt, close_price FROM historic_data
                                    WHERE sec_id = %s"""
 
         cursor.execute(sql_insert_query, (sec_id,))

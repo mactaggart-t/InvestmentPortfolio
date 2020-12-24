@@ -253,3 +253,23 @@ def get_purchases(user_id):
         cursor.close()
         connection_hosted.close()
     return total_purchase
+
+
+def get_sector_from_id(sec_id):
+    try:
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
+
+        cursor = connection_hosted.cursor()
+        sql_insert_query = """SELECT sector FROM all_securities
+                           WHERE sec_id = %s"""
+
+        cursor.execute(sql_insert_query, (sec_id,))
+        sector = cursor.fetchone()[0]
+        cursor.close()
+        connection_hosted.close()
+        return sector
+    except Error as error:
+        print("parameterized query failed {}".format(error))

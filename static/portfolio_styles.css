@@ -41,3 +41,13 @@
     margin: 10px auto 0 !important;
     float: right;
 }
+
+.sec_dist {
+    width: 50%;
+    float: left;
+}
+
+.sector_dist {
+    width: 50%;
+    float: right;
+}
