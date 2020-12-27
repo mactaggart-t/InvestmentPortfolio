@@ -12,7 +12,7 @@ from sql.update_data import get_historic_data, add_historic_price, get_security_
 from sql.get_security_id import (get_ticker_from_id, get_name_from_id, get_purchase, get_price_today, get_purchases,
                                  get_sector_from_id)
 from sql.transaction_history import get_transaction_history
-from sql.get_basic_info import get_all_sectors, sector_conversion
+from sql.get_basic_info import get_all_sectors, sector_conversion, get_ticker_info
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -41,6 +41,19 @@ def render_s_and_p():
 @app.route('/getAllTickers')
 def get_all_tick():
     return jsonify(get_all_tickers())
+
+
+@app.route('/getPortTickers')
+def get_port_tick():
+    sec_ids = get_port_secs(session.get('user_id'))
+    data = []
+    for i in sec_ids:
+        ticker = get_ticker_from_id(i)
+        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        if shares <= 0:
+            continue
+        data.append(ticker)
+    return jsonify(data)
 
 
 @app.route('/portfolio')
@@ -244,6 +257,12 @@ def get_price():
 def get_chart():
     ticker_name = request.args['ticker_name']
     return get_historic_data(ticker_name, datetime(2016, 1, 19, 0, 0).timestamp(), datetime.today().timestamp())
+
+
+@app.route('/getSingleTickerInfo')
+def get_single_ticker_info():
+    ticker = request.args['ticker'].replace('[', '').replace(']', '').replace('"', '').split(',')[0]
+    return jsonify(get_ticker_info(ticker))
 
 
 if __name__ == '__main__':

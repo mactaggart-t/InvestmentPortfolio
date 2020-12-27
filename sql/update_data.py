@@ -27,12 +27,11 @@ def get_all_tickers():
         all_tickers = []
         for i in tickers:
             all_tickers.append(i[0])
-    except Error as error:
-        print("parameterized query failed {}".format(error))
-    finally:
         cursor.close()
         connection_hosted.close()
-    return all_tickers
+        return all_tickers
+    except Error as error:
+        print("parameterized query failed {}".format(error))
 
 
 def manage_updates():

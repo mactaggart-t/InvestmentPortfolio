@@ -51,3 +51,15 @@
     width: 50%;
     float: right;
 }
+
+.search_box{
+    margin-right: 5px;
+    margin-bottom: 5px;
+    max-width: 25%;
+    min-width: 200px;
+    float: left;
+}
+
+.search_container{
+    width: 100%;
+}
