@@ -20,7 +20,12 @@ app.secret_key = 'test'
 
 @app.route('/')
 def home():
-    return render_template('research.html')
+    return render_template('about.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 
 @app.route('/personalInv')
