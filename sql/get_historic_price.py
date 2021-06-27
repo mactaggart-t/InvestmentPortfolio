@@ -1,6 +1,5 @@
 from mysql.connector import Error
 import pymysql
-import time
 
 
 def get_historic_price_db(sec_id):

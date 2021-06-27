@@ -3,7 +3,7 @@
 {% block title %} Home {% endblock title %}
 
 {% block stylesheet %}
-    <link rel="stylesheet" type="text/css" href="/static/personal_inv_styles.css">
+    <link rel="stylesheet" type="text/css" href="/static/s_and_p_styles.css">
 {% endblock stylesheet %}
 
 {% block scripts %}
@@ -22,5 +22,11 @@
 {% endblock list_elems %}
 
 {% block content %}
-    <div id="submitBtn"></div>
+    <div class="headerStyle">
+        <h1 id="headerText">S&P500</h1>
+    </div>
+    <div id="itemSelection" class="search_box"></div>
+    <div id="drill-down-title" class="drillDown"></div>
+    <div id="heatmap"></div>
+    <div id="toastContainer"></div>
 {% endblock content %}

@@ -13,6 +13,7 @@ from sql.get_security_id import (get_ticker_from_id, get_name_from_id, get_purch
                                  get_sector_from_id)
 from sql.transaction_history import get_transaction_history
 from sql.get_basic_info import get_all_sectors, sector_conversion, get_ticker_info
+from sql.get_heatmap import get_heatmap
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -268,6 +269,11 @@ def get_chart():
 def get_single_ticker_info():
     ticker = request.args['ticker'].replace('[', '').replace(']', '').replace('"', '').split(',')[0]
     return jsonify(get_ticker_info(ticker))
+
+
+@app.route('/getHeatmap')
+def get_heatmap_endpoint():
+    return jsonify(get_heatmap())
 
 
 if __name__ == '__main__':

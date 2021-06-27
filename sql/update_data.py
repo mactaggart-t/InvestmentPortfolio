@@ -1,6 +1,7 @@
 from mysql.connector import Error
 import pymysql
 from bs4 import BeautifulSoup
+from urllib.request import urlopen
 from datetime import datetime, date, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -30,6 +31,77 @@ def get_all_tickers():
         cursor.close()
         connection_hosted.close()
         return all_tickers
+    except Error as error:
+        print("parameterized query failed {}".format(error))
+
+
+def get_all_s_and_p():
+    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+    page = urlopen(url)
+    soup = BeautifulSoup(page, 'html.parser')
+    table_body = soup.find('table', {'id': 'constituents'}).find('tbody')
+    rows = table_body.find_all('tr')
+    tickers = []
+    for row in rows:
+        cols = row.find_all('td')
+        if len(cols) > 0:
+            tickers.append(cols[0].text.replace('\n', ''))
+    return tickers
+
+
+def manage_intraday_updates():
+    all_s_p = get_all_s_and_p()
+    for i in get_all_tickers():
+        in_sp = i in all_s_p
+        record_dt = datetime.today()
+        change_dollar, change_percent, market_cap, current_price = get_intraday_data(i)
+        replace_data(get_security_id(i), change_dollar, change_percent, market_cap, current_price, record_dt, in_sp)
+
+
+def get_intraday_data(ticker):
+    print(ticker)
+    url = 'https://finance.yahoo.com/quote/' + ticker + '?p=' + ticker + '&.tsrc=fin-srch'
+    page = urlopen(url)
+    soup = BeautifulSoup(page, 'html.parser')
+    changes = soup.find('span', {'data-reactid': '51'}).text.split(" ")
+    change_dollar = float(changes[0].replace("+", ""))
+    change_percent = float(changes[1].replace("(", "").replace("%", "").replace(")", "").replace("+", ""))
+    market_cap = calc_market_cap(soup.find('span', {'data-reactid': '139'}).text)
+    current_price = float(soup.find('span', {'data-reactid': '50'}).text)
+    return change_dollar, change_percent, market_cap, current_price
+
+
+def calc_market_cap(mk_str):
+    last_char = mk_str[-1]
+    if last_char == 'T':
+        val = float(mk_str[:-1]) * 1000000000000
+    elif last_char == 'B':
+        val = float(mk_str[:-1]) * 1000000000
+    else:
+        val = float(mk_str[:-1]) * 1000000
+    return val
+
+
+def replace_data(sec_id, change_dollar, change_percent, market_cap, current_price, record_dt, in_sp):
+    try:
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
+
+        cursor = connection_hosted.cursor()
+        sql_delete_query = """DELETE FROM today_data WHERE sec_id = %s"""
+        sql_insert_query = """INSERT INTO today_data
+                           (sec_id, change_dollar, change_percent, market_cap, current_price, record_dt, in_s_p)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s)"""
+        cursor.execute(sql_delete_query, sec_id)
+        cursor.executemany(sql_insert_query, [(sec_id, change_dollar, change_percent, market_cap, current_price,
+                                              record_dt, in_sp)])
+        connection_hosted.commit()
+        print("Data inserted successfully table")
+        cursor.close()
+        connection_hosted.close()
+        print("MySQL connection is closed")
     except Error as error:
         print("parameterized query failed {}".format(error))
 

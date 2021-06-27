@@ -1,30 +1,7 @@
 from mysql.connector import Error
-from .get_security_id import get_price_today
+from .get_security_id import get_price_today, sector_conversion
 from .update_data import get_security_id
 import pymysql
-
-
-def sector_conversion(argument):
-    switcher = {
-        'Communication Services': 'Communication Services',
-        'Communication Services\n': 'Communication Services',
-        'Consumer Cyclical': 'Consumer Cyclical',
-        'Consumer Defensive': 'Consumer Defensive',
-        'Consumer Discretionary': 'Consumer Defensive',
-        'Consumer Staples': 'Consumer Cyclical',
-        'Energy': 'Energy',
-        'Financial Services': 'Financials',
-        'Financials': 'Financials',
-        'Health Care': 'Healthcare',
-        'Healthcare': 'Healthcare',
-        'Industrials': 'Industrials',
-        'Information Technology': 'Information Technology',
-        'Materials': 'Materials',
-        'Real Estate': 'Real Estate',
-        'Technology': 'Information Technology',
-        'Utilities': 'Utilities'
-    }
-    return switcher.get(argument, "Other")
 
 
 def get_all_sectors():

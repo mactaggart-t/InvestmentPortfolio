@@ -273,3 +273,52 @@ def get_sector_from_id(sec_id):
         return sector
     except Error as error:
         print("parameterized query failed {}".format(error))
+
+
+def get_tickers_from_ids(sec_id_list):
+    try:
+        connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
+                                            db='investment_portfolio',
+                                            user='investPort',
+                                            passwd='InvestPortPass')
+
+        cursor = connection_hosted.cursor()
+        sql_insert_query = """SELECT ticker, sec_name, sector FROM all_securities
+                           WHERE sec_id = %s"""
+        ticker_list = []
+        sector_list = []
+        security_list = []
+        for i in sec_id_list:
+            cursor.execute(sql_insert_query, (i,))
+            item_data = cursor.fetchone()
+            ticker_list.append(item_data[0])
+            sector_list.append(sector_conversion(item_data[2]))
+            security_list.append(item_data[1])
+        cursor.close()
+        connection_hosted.close()
+        return ticker_list, sector_list, security_list
+    except Error as error:
+        print("parameterized query failed {}".format(error))
+
+
+def sector_conversion(argument):
+    switcher = {
+        'Communication Services': 'Communication Services',
+        'Communication Services\n': 'Communication Services',
+        'Consumer Cyclical': 'Consumer Cyclical',
+        'Consumer Defensive': 'Consumer Defensive',
+        'Consumer Discretionary': 'Consumer Defensive',
+        'Consumer Staples': 'Consumer Cyclical',
+        'Energy': 'Energy',
+        'Financial Services': 'Financials',
+        'Financials': 'Financials',
+        'Health Care': 'Healthcare',
+        'Healthcare': 'Healthcare',
+        'Industrials': 'Industrials',
+        'Information Technology': 'Information Technology',
+        'Materials': 'Materials',
+        'Real Estate': 'Real Estate',
+        'Technology': 'Information Technology',
+        'Utilities': 'Utilities'
+    }
+    return switcher.get(argument, "Other")
