@@ -1,0 +1,6 @@
+.search_box{
+    margin: 5px;
+    max-width: 25%;
+    min-width: 200px;
+    float: left;
+}
