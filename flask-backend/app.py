@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta
+from loguru import logger
 
 from flask import Flask, render_template, jsonify, request, session
 from flask_cors import CORS
@@ -29,6 +30,24 @@ def home():
 @app.route('/api/getAllTickers', methods=['GET'])
 def get_all_tick():
     return jsonify(get_all_tickers())
+
+
+@app.route('/api/getTickerValues', methods=['POST'])
+def get_ticker_values():
+    tickers = request.json['selected']
+    data = []
+    chart_data = []
+    for i in tickers:
+        data.append(get_historic_price_db(get_security_id(i)))
+    for ticker_data in data:
+        for datapoint in ticker_data:
+            found_item = next((item for item in chart_data if item['date'] == datapoint['date']), None)
+            if found_item is None:
+                chart_data.append({'date': datapoint['date'], datapoint['ticker']: datapoint['price']})
+            else:
+                found_item[datapoint['ticker']] = datapoint['price']
+    chart_data = sorted(chart_data, key=lambda k: k['date'])
+    return jsonify({'chartData': chart_data, 'selected': tickers})
 
 
 @app.route('/getPortTickers')
