@@ -4,6 +4,7 @@ import Button from '@material-ui/core/Button';
 import { ToastContainer, toast } from "react-toastify";
 import PropTypes from 'prop-types'
 import './research.css'
+import 'react-toastify/dist/ReactToastify.min.css';
 import Header from "../header/header"
 import { Multiselect } from 'multiselect-react-dropdown'
 import {connect} from "react-redux";
@@ -116,7 +117,7 @@ function SearchBar(props) {
                         style={{textTransform: 'none'}}
                         variant="contained"
                         color="primary"
-                        onClick={handleOnClick}>Submit</Button>
+                        onClick={handleOnClick}>Apply</Button>
                 </div>
             </div>
 
@@ -136,6 +137,7 @@ class Research extends Component {
     }
 
     render() {
+        toast.dismiss();
         return (
             <>
                 <Header selected={'research'}/>
