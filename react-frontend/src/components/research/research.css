@@ -31,6 +31,34 @@ h2 {
 }
 
 .chart_container{
-    width: 90%;
+    width: 100%;
     height: 50%;
+}
+
+.center_header{
+    margin: auto;
+    width: 100%;
+}
+
+.hiddenDupe {
+    margin-right: auto;
+    visibility: hidden;
+}
+.centerElem {
+    display: flex;
+    margin: 1px;
+    padding: 5px;
+    width: fit-content;
+}
+.rightElem {
+    margin-left: auto;
+}
+.listStyle {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
 }

@@ -3,12 +3,13 @@ import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsiv
 import Button from '@material-ui/core/Button';
 import { ToastContainer, toast } from "react-toastify";
 import PropTypes from 'prop-types'
-import './research.css'
-import 'react-toastify/dist/ReactToastify.min.css';
-import Header from "../header/header"
 import { Multiselect } from 'multiselect-react-dropdown'
 import {connect} from "react-redux";
+import Selectors from './selectors';
+import Header from "../header/header"
 import {getAllTickers, submitSelectedTickers} from "../../actions/research";
+import './research.css'
+import 'react-toastify/dist/ReactToastify.min.css';
 
 function StockChart(props) {
     const getStroke = (itemIndex) => {
@@ -39,7 +40,7 @@ function StockChart(props) {
     }
 
     const formatXAxis = (tickItem) => {
-        if (tickItem === 0 || tickItem === 'auto') {
+        if (tickItem === 0 || tickItem === 'auto' || tickItem === '') {
             return '';
         }
         return getFormattedDate(new Date(tickItem));
@@ -47,11 +48,14 @@ function StockChart(props) {
 
     return (
         <div className={'chart_container'}>
-            <h2>Compare or View Stock Prices</h2>
+            <div className={'center_header'}>
+                <h2>Compare or View Stock Prices</h2>
+                <Selectors />
+            </div>
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   width={800}
-                  data={props.chartData}
+                  data={props.formattedData}
                   margin={{
                     top: 5,
                     right: 30,
@@ -61,11 +65,11 @@ function StockChart(props) {
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" label={{ value: "Date", dy: -27}} tickFormatter={formatXAxis} angle={45}  dy={25}/>
-                  <YAxis label={{ value:"Price($)", angle: -90, dx: 40 }} tickFormatter={t => "$" + t}/>
+                  <YAxis label={{ value: (props.type === '$') ? "Price($)": "Change(%)", angle: -90, dx: 40 }} tickFormatter={t => (props.type === '$') ? "$" + t : t + '%'}/>
                   <Tooltip labelFormatter={t => new Date(t).toLocaleString().split(',')[0]}/>
                   <Legend verticalAlign="top"/>
                   {props.selected.map(ticker => (
-                      <Line type="monotone" dataKey={ticker} dot={false} stroke={getStroke(props.selected.indexOf(ticker))}/>
+                      <Line key={ticker} type="monotone" dataKey={ticker} dot={false} stroke={getStroke(props.selected.indexOf(ticker))}/>
                   ))}
                 </LineChart>
             </ResponsiveContainer>
@@ -75,7 +79,12 @@ function StockChart(props) {
 
 StockChart.propTypes = {
     selected: PropTypes.arrayOf(PropTypes.string).isRequired,
+    type: PropTypes.string.isRequired,
     chartData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]))).isRequired,
+    formattedData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number
     ]))).isRequired,
@@ -145,7 +154,11 @@ class Research extends Component {
                            selected={this.props.selected}
                            submitSelectedTickers={this.props.submitSelectedTickers}
                 />
-                <StockChart chartData={this.props.chartData} selected={this.props.selected}/>
+                <StockChart type={this.props.type}
+                            chartData={this.props.chartData}
+                            selected={this.props.selected}
+                            formattedData={this.props.formattedData}
+                />
                 <ToastContainer
                 position="bottom-center"
                 autoClose={false}
@@ -160,7 +173,12 @@ class Research extends Component {
 Research.propTypes = {
     items: PropTypes.arrayOf(PropTypes.string).isRequired,
     selected: PropTypes.arrayOf(PropTypes.string).isRequired,
+    type: PropTypes.string.isRequired,
     chartData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]))).isRequired,
+    formattedData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number
     ]))).isRequired,
@@ -171,7 +189,9 @@ Research.propTypes = {
 const mapStateToProps = state => ({
     items: state.research.items,
     selected: state.research.selected,
+    type: state.research.type,
     chartData: state.research.chartData,
+    formattedData: state.research.formattedData,
 });
 
 export default connect(mapStateToProps, { getAllTickers, submitSelectedTickers })(Research)
