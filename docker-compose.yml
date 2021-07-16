@@ -1,0 +1,18 @@
+version: "3"
+services:
+  server:
+    build:  ./flask-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./flask-backend:/app
+    environment:
+      FLASK_ENV: development
+  web:
+    build:  ./react-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./react-frontend:/user/src/app
+    depends_on:
+      - server
