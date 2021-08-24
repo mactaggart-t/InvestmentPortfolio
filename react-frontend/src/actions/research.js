@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { returnErrors } from './messages';
 
 import {
     GET_ALL_TICKERS, API_BASE_URL, NETWORK_ERROR, SUBMIT_SELECTED_TICKERS,
@@ -22,14 +21,9 @@ export const getAllTickers = () => (dispatch) => {
             });
         })
         .catch((err) => {
-            if (typeof err.response === "undefined") {
-                dispatch({
-                    type: NETWORK_ERROR
-                })
-            }
-            else {
-                dispatch(returnErrors('error', err))
-            }
+            dispatch({
+                type: NETWORK_ERROR
+            })
         });
 };
 
@@ -43,14 +37,9 @@ export const submitSelectedTickers = (selectedTickers) => (dispatch) => {
             });
         })
         .catch((err) => {
-            if (typeof err.response === "undefined") {
-                dispatch({
-                    type: NETWORK_ERROR
-                })
-            }
-            else {
-                dispatch(returnErrors('error', err))
-            }
+            dispatch({
+                type: NETWORK_ERROR
+            })
         });
 };
 

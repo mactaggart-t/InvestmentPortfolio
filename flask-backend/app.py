@@ -1,5 +1,4 @@
 from datetime import datetime, date, timedelta
-from loguru import logger
 
 from flask import Flask, render_template, jsonify, request, session
 from flask_cors import CORS
@@ -15,7 +14,7 @@ from sql.get_security_id import (get_ticker_from_id, get_name_from_id, get_purch
                                  get_sector_from_id)
 from sql.transaction_history import get_transaction_history
 from sql.get_basic_info import get_all_sectors, sector_conversion, get_ticker_info
-from sql.get_heatmap import get_heatmap
+from sql.get_treemap_data import get_market_cap_data
 
 app = Flask(__name__, template_folder='./react-frontend', static_folder="./react-frontend")
 app.secret_key = 'test'
@@ -48,6 +47,12 @@ def get_ticker_values():
                 found_item[datapoint['ticker']] = datapoint['price']
     chart_data = sorted(chart_data, key=lambda k: k['date'])
     return jsonify({'chartData': chart_data, 'selected': tickers})
+
+
+@app.route('/api/getTreemapData', methods=['GET'])
+def get_treemap_data():
+    market_cap_data, all_sectors = get_market_cap_data()
+    return jsonify({'marketCapData': market_cap_data, 'allSectors': all_sectors})
 
 
 @app.route('/getPortTickers')

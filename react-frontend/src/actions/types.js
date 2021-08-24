@@ -13,9 +13,10 @@ function deltaDate(input, days, months, years) {
 
 export const GET_ALL_TICKERS = 'GET_ALL_TICKERS';
 export const SUBMIT_SELECTED_TICKERS = 'SUBMIT_SELECTED_TICKERS';
-export const GET_ERRORS = 'GET_ERRORS';
 export const NETWORK_ERROR = 'NETWORK_ERROR';
 export const FORMAT_DATA = 'FORMAT_DATA';
+export const GET_ALL_SP_CHARTS = 'GET_SP500_CHARTS';
+export const SET_SECTOR = 'SET_SECTOR';
 export const API_BASE_URL = 'http://localhost:5000';
 export const TWOW = deltaDate(today, -14, 0, 0);
 export const ONEM = deltaDate(today, 0, -1, 0);

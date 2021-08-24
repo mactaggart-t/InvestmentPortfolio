@@ -49,7 +49,6 @@ function StockChart(props) {
     return (
         <div className={'chart_container'}>
             <div className={'center_header'}>
-                <h2>Compare or View Stock Prices</h2>
                 <Selectors />
             </div>
             <ResponsiveContainer width="100%" height="100%">
@@ -150,6 +149,9 @@ class Research extends Component {
         return (
             <>
                 <Header selected={'research'}/>
+                <div className="headerStyle">
+                    <h1 id="headerText">Compare or View Stock Prices</h1>
+                </div>
                 <SearchBar items={this.props.items}
                            selected={this.props.selected}
                            submitSelectedTickers={this.props.submitSelectedTickers}
