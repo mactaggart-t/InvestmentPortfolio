@@ -9,7 +9,14 @@ h2 {
     font-family: Verdana, sans-serif;
     font-weight: normal;
 }
-
+.headerStyle {
+    padding: 5px;
+    text-align: center;
+    background: #1abc9c;
+    color: white;
+    font-size: 15px;
+    margin: 0 auto;
+}
 .searchContainer{
     margin: 5px;
     min-width: 300px;

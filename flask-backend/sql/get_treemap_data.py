@@ -1,9 +1,10 @@
 from mysql.connector import Error
+from loguru import logger
 from .get_security_id import get_tickers_from_ids
 import pymysql
 
 
-def get_heatmap():
+def get_market_cap_data():
     try:
         connection_hosted = pymysql.connect(host='investmentport.c1xr79lgjc2q.us-east-1.rds.amazonaws.com',
                                             db='investment_portfolio',
@@ -19,29 +20,35 @@ def get_heatmap():
         for i in data:
             sec_id_list.append(i[0])
         ticker_list, sector_list, security_list = get_tickers_from_ids(sec_id_list)
-        formatted_data = []
+        formatted_data = {'all': []}
         for i in range(0, len(data)):
-            if not any(d['name'] == sector_list[i] for d in formatted_data):
-                formatted_data.append({
-                    'name': sector_list[i],
-                    'items': [{
-                        'value': data[i][1],
-                        'name': ticker_list[i],
-                        'sec_name': security_list[i]
-                    }]
+            if sector_list[i] in formatted_data.keys():
+                formatted_data[sector_list[i]].append({
+                    'name': ticker_list[i],
+                    'fullName': security_list[i],
+                    'size': data[i][1]
                 })
             else:
-                for j in formatted_data:
-                    if j['name'] == sector_list[i]:
-                        j['items'].append({
-                            'value': data[i][1],
-                            'name': ticker_list[i],
-                            'sec_name': security_list[i]
-                        })
+                formatted_data[sector_list[i]] = [{
+                    'name': ticker_list[i],
+                    'fullName': security_list[i],
+                    'size': data[i][1]
+                }]
+            formatted_data['all'].append({
+                'name': ticker_list[i],
+                'fullName': security_list[i],
+                'size': data[i][1]
+            })
+        for key in formatted_data:
+            formatted_data[key] = sorted(formatted_data[key], key=lambda k: k['size'])
+            formatted_data[key].reverse()
+        unique_sectors = set(sector_list)
+        unique_sectors = list(unique_sectors)
+        unique_sectors.append('all')
         cursor.close()
         connection_hosted.close()
         print("MySQL connection is closed")
-        return formatted_data
+        return formatted_data, unique_sectors
     except Error as error:
         print("parameterized query failed {}".format(error))
 

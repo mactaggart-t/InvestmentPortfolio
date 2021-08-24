@@ -1,4 +1,4 @@
-import {GET_ALL_TICKERS, GET_ERRORS, NETWORK_ERROR, SUBMIT_SELECTED_TICKERS, FORMAT_DATA} from "../actions/types";
+import {GET_ALL_TICKERS, NETWORK_ERROR, SUBMIT_SELECTED_TICKERS, FORMAT_DATA} from "../actions/types";
 
 const initialState = {
   items: [],
@@ -22,8 +22,6 @@ function research(state = initialState, action) {
         type: '$'};
     case NETWORK_ERROR:
       return { ...state, items: ['Network Error']};
-    case GET_ERRORS:
-      return { ...state, items: ['No items found'] };
     case FORMAT_DATA:
       return {...state,
         formattedData: action.payload.formattedData,
