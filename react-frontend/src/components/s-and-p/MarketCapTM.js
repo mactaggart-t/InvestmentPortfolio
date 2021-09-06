@@ -35,7 +35,9 @@ class MarketCapTM extends Component {
     }
 
     render() {
-        toast.dismiss();
+        if (this.props.chartData !== {}) {
+            toast.dismiss();
+        }
         return (
             <>
                 <div className={'titleStyle'}>

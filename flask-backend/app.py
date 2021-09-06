@@ -49,6 +49,17 @@ def get_ticker_values():
     return jsonify({'chartData': chart_data, 'selected': tickers})
 
 
+@app.route('/signIn', methods=['POST'])
+def log_in():
+    username = request.json['username']
+    password = request.json['password']
+    if good_login(username, password):
+        session['username'] = username
+        session['user_id'] = get_user_id(username)
+        return jsonify({'result': 'success', 'username': username})
+    return jsonify({'result': 'failure'})
+
+
 @app.route('/api/getTreemapData', methods=['GET'])
 def get_treemap_data():
     market_cap_data, all_sectors = get_market_cap_data()
@@ -78,32 +89,22 @@ def create_account():
     return render_template('create_portfolio.html')
 
 
-@app.route('/createAcct')
+@app.route('/createAcct', methods=['POST'])
 def create_acct():
-    username = request.args['username']
-    password1 = request.args['password']
-    password2 = request.args['secondPass']
+    username = request.json['username']
+    password1 = request.json['password1']
+    password2 = request.json['password2']
+    response = 'success'
     if password1 != password2:
-        return 'no match'
+        response = 'no match'
     elif password1 == '':
-        return 'no empty'
+        response = 'no empty'
     elif user_taken(username):
-        return 'username taken'
+        response = 'username taken'
     add_user(username, generate_password_hash(password1))
     session['username'] = username
     session['user_id'] = get_user_id(username)
-    return 'success'
-
-
-@app.route('/signIn')
-def log_in():
-    username = request.args['username']
-    password = request.args['password']
-    if good_login(username, password):
-        session['username'] = username
-        session['user_id'] = get_user_id(username)
-        return 'success'
-    return 'failure'
+    return jsonify({'response': response, 'username': username})
 
 
 @app.route('/getUsername')
