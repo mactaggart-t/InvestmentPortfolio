@@ -10,41 +10,9 @@ import Header from "../header/header"
 import {getAllTickers, submitSelectedTickers} from "../../actions/research";
 import './research.css'
 import 'react-toastify/dist/ReactToastify.min.css';
+import {formatXAxis, getStroke} from "../../actions/chartingUtils";
 
 function StockChart(props) {
-    const getStroke = (itemIndex) => {
-        switch (itemIndex % 5) {
-            case 0:
-                return '#004E98';
-            case 1:
-                return '#C03221';
-            case 2:
-                return '#00CC14';
-            case 3:
-                return '#F99FAB';
-            default:
-                return '#989C94'
-        }
-    };
-
-    function getFormattedDate(date) {
-        const year = date.getFullYear();
-
-        let month = (1 + date.getMonth()).toString();
-        month = month.length > 1 ? month : '0' + month;
-
-        let day = date.getDate().toString();
-        day = day.length > 1 ? day : '0' + day;
-
-        return month + '/' + day + '/' + year;
-    }
-
-    const formatXAxis = (tickItem) => {
-        if (tickItem === 0 || tickItem === 'auto' || tickItem === '') {
-            return '';
-        }
-        return getFormattedDate(new Date(tickItem));
-    };
 
     return (
         <div className={'chart_container'}>

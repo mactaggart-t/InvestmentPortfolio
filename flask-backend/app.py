@@ -15,6 +15,7 @@ from sql.get_security_id import (get_ticker_from_id, get_name_from_id, get_purch
 from sql.transaction_history import get_transaction_history
 from sql.get_basic_info import get_all_sectors, sector_conversion, get_ticker_info
 from sql.get_treemap_data import get_market_cap_data
+from loguru import logger
 
 app = Flask(__name__, template_folder='./react-frontend', static_folder="./react-frontend")
 app.secret_key = 'test'
@@ -55,7 +56,6 @@ def log_in():
     password = request.json['password']
     if good_login(username, password):
         session['username'] = username
-        session['user_id'] = get_user_id(username)
         return jsonify({'result': 'success', 'username': username})
     return jsonify({'result': 'failure'})
 
@@ -144,23 +144,24 @@ def new_transaction():
     return 'success'
 
 
-@app.route('/loadPortfolio')
+@app.route('/loadPortfolio', methods=["POST"])
 def load_portfolio():
-    sec_ids = get_port_secs(session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
+    sec_ids = get_port_secs(user_id)
     portfolio_value = []
-    names = ["Portfolio Value"]
-    ticker = ["PORT"]
     start_date = datetime.today().date()
     end_date = date(2000, 1, 1)
     delta = timedelta(days=1)
     while start_date-delta >= end_date:
         if start_date.weekday() != 5 and start_date.weekday() != 6:
-            portfolio_value.append({'date': start_date, 'price': 0})
+            portfolio_value.append({'date': start_date, 'Value': 0})
         start_date -= delta
     for i in sec_ids:
-        portfolio_value = add_value(i, session.get('user_id'), end_date, portfolio_value)
+        portfolio_value = add_value(i, user_id, end_date, portfolio_value)
     portfolio_value = remove_anomolies(portfolio_value)
-    all_data = jsonify([names, ticker, [portfolio_value]])
+    portfolio_value.reverse()
+    all_data = jsonify({'port_value': portfolio_value})
     return all_data
 
 

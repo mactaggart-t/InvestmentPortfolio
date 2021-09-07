@@ -73,9 +73,9 @@ Selectors.propTypes = {
 };
 
 const mapStateToProps = state => ({
-    chartData: state.research.chartData,
-    time: state.research.time,
-    type: state.research.type,
+    chartData: state.personalInv.chartData,
+    time: state.personalInv.time,
+    type: state.personalInv.type,
 });
 
 export default connect(mapStateToProps, { formatData })(Selectors)

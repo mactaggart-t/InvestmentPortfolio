@@ -4,7 +4,8 @@ import { Redirect } from "react-router";
 import PropTypes from "prop-types";
 import Header from "../header/header";
 import './personalInv.css'
-import ChartSelector from "./personalInvCharts";
+import ChartOverview, {ChartSelector} from "./personalInvCharts";
+import {changeView} from "../../actions/personalInv";
 
 class PersonalInv extends Component {
     render() {
@@ -17,7 +18,8 @@ class PersonalInv extends Component {
                 <div className="headerStyle">
                     <h1 id="headerText">{"Hello " + this.props.username}</h1>
                 </div>
-                <ChartSelector />
+                <ChartSelector changeView={this.props.changeView}/>
+                <ChartOverview />
             </>
             );
     }
@@ -25,7 +27,8 @@ class PersonalInv extends Component {
 
 PersonalInv.propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
-    username: PropTypes.string.isRequired
+    username: PropTypes.string.isRequired,
+    changeView: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -33,4 +36,4 @@ const mapStateToProps = state => ({
     username: state.personalInv.username,
 });
 
-export default connect(mapStateToProps)(PersonalInv)
+export default connect(mapStateToProps, {changeView})(PersonalInv)

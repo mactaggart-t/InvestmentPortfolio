@@ -111,7 +111,7 @@ def add_value(sec_id, user_id, start_dt, portfolio_value):
         for i in range(0, len(portfolio_value)):
             if portfolio_value[i]['date'] in price_dict.keys():
                 price = price_dict[portfolio_value[i]['date']]
-                portfolio_value[i]['price'] += get_adjusted_price(price, portfolio_value[i]['date'], num_shares)
+                portfolio_value[i]['Value'] += get_adjusted_price(price, portfolio_value[i]['date'], num_shares)
 
     except Error as error:
         print("parameterized query failed {}".format(error))
@@ -125,7 +125,7 @@ def add_value(sec_id, user_id, start_dt, portfolio_value):
 def remove_anomolies(portfolio_data):
     invalid_indexes = []
     for i in range(0, len(portfolio_data)):
-        if not portfolio_data[i]['price']:
+        if not portfolio_data[i]['Value']:
             invalid_indexes.append(portfolio_data[i])
     for i in invalid_indexes:
         portfolio_data.remove(i)

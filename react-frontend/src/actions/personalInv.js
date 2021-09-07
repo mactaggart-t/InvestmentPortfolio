@@ -3,7 +3,7 @@ import {
     LOGIN_FAILURE,
     LOGOUT,
     API_BASE_URL,
-    NETWORK_ERROR, CREATE_SUCCESS, CREATE_FAILURE,
+    NETWORK_ERROR, CREATE_SUCCESS, CREATE_FAILURE, PERSONAL_INV_VIEW, PORTFOLIO_LOADED,
 } from "./types";
 import axios from "axios";
 
@@ -62,4 +62,27 @@ export const logout = () => dispatch => {
     dispatch({
         type: LOGOUT,
     });
+};
+
+export const changeView = (state) => dispatch => {
+    dispatch({
+        type: PERSONAL_INV_VIEW,
+        payload: state[0].value,
+    });
+};
+
+export const getPortValue = (username) => (dispatch) => {
+    instance
+        .post('/loadPortfolio', {username: username})
+        .then((res) => {
+            dispatch({
+                type: PORTFOLIO_LOADED,
+                payload: res.data.port_value,
+            });
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
 };

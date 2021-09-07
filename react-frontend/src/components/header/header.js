@@ -6,7 +6,7 @@ import {logout} from '../../actions/personalInv'
 import './header.css'
 
 function Header(props) {
-    if (props.isLoggedIn) {
+    if (props.isLoggedIn && props.selected === 'personalInv') {
         return (
             <ul className={'header'}>
                 <li className={'header'}><Link className={(props.selected === 'personalInv') ? "active": "inactive"} to='/personalInv'>
