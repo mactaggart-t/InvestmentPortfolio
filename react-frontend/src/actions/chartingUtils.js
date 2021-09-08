@@ -34,7 +34,7 @@ export const getStroke = (itemIndex) => {
     }
 };
 
-export const formatData = (fullData, time, type) => (dispatch) => {
+export const formatData = (fullData, time, type, chartType, purchases=[]) => (dispatch) => {
     let copyData = fullData.slice(0);
     let selected_time = new Date('Jan 1, 2000');
     switch (time) {
@@ -70,20 +70,41 @@ export const formatData = (fullData, time, type) => (dispatch) => {
     let formattedData = copyData.slice(0, index).reverse();
     let reformattedData = [];
     if (type === '%') {
-        const basePrices = formattedData[0];
-        for (let i = 0; i < formattedData.length; i++) {
-            let dataObject = {};
-            for (const [key, value] of Object.entries(formattedData[i])) {
-                if (key === 'date') {
-                    dataObject[key] = value;
+        if (chartType === 'portfolio') {
+            let basePrice = formattedData[0]['Value'];
+            for (let i = 0; i < formattedData.length; i++) {
+                let dataObject = {};
+                for (const [key, value] of Object.entries(formattedData[i])) {
+                    if (key === 'date') {
+                        dataObject[key] = value;
+                    } else {
+                        for (let j = 0; j < purchases.length; j++) {
+                            if(Date.parse(purchases[j]['date']) === Date.parse(formattedData[i]['date'])) {
+                                basePrice += purchases[j]['price'];
+                                break;
+                            }
+                        }
+                        dataObject[key] = (value - basePrice) / basePrice * 100;
+                    }
                 }
-                else {
-                    dataObject[key] = (value - basePrices[key])/basePrices[key] * 100
-                }
+                reformattedData.push(dataObject)
             }
-            reformattedData.push(dataObject)
+            formattedData = reformattedData;
+        } else {
+            const basePrices = formattedData[0];
+            for (let i = 0; i < formattedData.length; i++) {
+                let dataObject = {};
+                for (const [key, value] of Object.entries(formattedData[i])) {
+                    if (key === 'date') {
+                        dataObject[key] = value;
+                    } else {
+                        dataObject[key] = (value - basePrices[key]) / basePrices[key] * 100
+                    }
+                }
+                reformattedData.push(dataObject)
+            }
+            formattedData = reformattedData;
         }
-        formattedData = reformattedData;
     }
     dispatch({
         type: FORMAT_DATA,

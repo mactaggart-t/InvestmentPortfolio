@@ -235,7 +235,7 @@ def get_purchases(user_id):
                                               'price': total_purchase[-1]['price'] + i[0] * i[3]})
                     else:
                         total_purchase.append({'date': i[1],
-                                               'price': total_purchase[-1]['price'] + i[0] * i[3]})
+                                               'price': i[0] * i[3]})
                 except IndexError:
                     total_purchase.append({'date': i[1],
                                            'price': i[0] * i[3]})
@@ -245,7 +245,7 @@ def get_purchases(user_id):
                                           'price': total_purchase[-1]['price'] - i[0] * i[3]})
                 else:
                     total_purchase.append({'date': i[1],
-                                           'price': total_purchase[-1]['price'] - i[0] * i[3]})
+                                           'price': -i[0] * i[3]})
 
     except Error as error:
         print("parameterized query failed {}".format(error))

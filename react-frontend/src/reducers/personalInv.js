@@ -5,17 +5,18 @@ import {
     CREATE_FAILURE,
     LOGOUT,
     PERSONAL_INV_VIEW,
-    PORTFOLIO_LOADED, FORMAT_DATA
+    PORTFOLIO_LOADED, FORMAT_DATA, PURCHASES_LOADED
 } from '../actions/types'
 
 const initialState = {
     isLoggedIn: false,
-    loginFailed: true,
+    loginFailed: false,
     duplicateAccount: true,
     username: '',
     selectedView: 'Portfolio Balance',
     chartData: [],
     formattedData: [],
+    purchases: [],
     type: '$',
     time: 'all'
 };
@@ -40,7 +41,6 @@ function personalInv(state = initialState, action) {
         case CREATE_FAILURE:
             return { ...state,
                 isLoggedIn: false,
-                loginFailed: true,
                 duplicateAccount: true};
         case LOGOUT:
             return { ...state,
@@ -59,6 +59,9 @@ function personalInv(state = initialState, action) {
                 formattedData: action.payload.formattedData,
                 time: action.payload.time,
                 type: action.payload.type};
+        case PURCHASES_LOADED:
+            return {...state,
+                purchases: action.payload};
         default:
             return state;
     }

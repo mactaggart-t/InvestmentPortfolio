@@ -14,7 +14,6 @@ const CustomTooltip = ({ active, payload, label }) => {
                 <div style={{'backgroundColor': 'white', 'padding': '5px'}}>
                     <p>{`${payload[0].payload.fullName} : $${payload[0].value/1000000000}B`}</p>
                 </div>
-
             );
         }
         if (payload[0].payload.name) {

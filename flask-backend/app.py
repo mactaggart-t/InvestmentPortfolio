@@ -234,9 +234,10 @@ def load_sector_distribution():
     return jsonify(sectors)
 
 
-@app.route('/getTotalPurchase')
+@app.route('/getTotalPurchase', methods=["POST"])
 def get_total_purchase():
-    user_id = (session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
     daily_purchase = get_purchases(user_id)
     return jsonify({'purchase': daily_purchase})
 

@@ -3,7 +3,7 @@ import {
     LOGIN_FAILURE,
     LOGOUT,
     API_BASE_URL,
-    NETWORK_ERROR, CREATE_SUCCESS, CREATE_FAILURE, PERSONAL_INV_VIEW, PORTFOLIO_LOADED,
+    NETWORK_ERROR, CREATE_SUCCESS, CREATE_FAILURE, PERSONAL_INV_VIEW, PORTFOLIO_LOADED, PURCHASES_LOADED,
 } from "./types";
 import axios from "axios";
 
@@ -78,6 +78,22 @@ export const getPortValue = (username) => (dispatch) => {
             dispatch({
                 type: PORTFOLIO_LOADED,
                 payload: res.data.port_value,
+            });
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
+};
+
+export const getPurchases = (username) => (dispatch) => {
+    instance
+        .post('/getTotalPurchase', {username: username})
+        .then((res) => {
+            dispatch({
+                type: PURCHASES_LOADED,
+                payload: res.data.purchase,
             });
         })
         .catch((err) => {

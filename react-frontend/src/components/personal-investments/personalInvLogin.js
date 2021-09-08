@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react'
+import React, {Component, useEffect, useState} from 'react'
 import './personalInv.css'
 import Header from "../header/header";
 import Button from '@material-ui/core/Button';
@@ -14,12 +14,14 @@ function LoginForm(props) {
     const [password, setPassword] = useState('');
     async function handleClick(username, password) {
         await props.loginFunc(username, password);
+    }
+
+    useEffect(() => {
         if (props.loginFailed) {
             toast.dismiss();
-            setTimeout(() => {  toast.error("Error: Incorrect Username or Password"); }, 500);
-
+            toast.error("Error: Incorrect Username or Password");
         }
-    }
+    });
 
     return (
         <div className={'loginBox'}>

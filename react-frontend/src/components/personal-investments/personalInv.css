@@ -60,3 +60,10 @@
     text-align: center;
     width: 100%;
 }
+
+.tooltipBackground {
+    background-color: white;
+    padding: 5px;
+    border: 1px solid gray;
+    text-align: center;
+}

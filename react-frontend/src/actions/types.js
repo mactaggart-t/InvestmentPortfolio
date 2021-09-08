@@ -24,6 +24,7 @@ export const CREATE_FAILURE = 'CREATE_FAILURE';
 export const LOGOUT = 'LOGOUT';
 export const PERSONAL_INV_VIEW = 'PERSONAL_INV_VIEW';
 export const PORTFOLIO_LOADED = 'PORTFOLIO_LOADED';
+export const PURCHASES_LOADED = 'PURCHASES_LOADED';
 export const API_BASE_URL = 'http://localhost:5000';
 export const TWOW = deltaDate(today, -14, 0, 0);
 export const ONEM = deltaDate(today, 0, -1, 0);
