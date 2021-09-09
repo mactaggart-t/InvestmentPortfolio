@@ -1,13 +1,14 @@
 import React, {Component, useEffect} from 'react';
 import Select from "react-dropdown-select";
 import {connect} from "react-redux";
-import Button from '@material-ui/core/Button';
 import './personalInv.css';
 import PropTypes from "prop-types";
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {formatXAxis} from "../../actions/chartingUtils";
-import {getPortValue, getPurchases} from "../../actions/personalInv";
+import {getPortfolio, getPortValue, getPurchases} from "../../actions/personalInv";
 import Selectors from "./selectors";
+import DataGrid from "./dataGridTemplate";
+import {TransactionForm} from './purchaseLogging';
 import {ToastContainer, toast} from "react-toastify";
 
 const CustomTooltip = (content) => {
@@ -31,6 +32,41 @@ const CustomTooltip = (content) => {
     }
     return null;
 };
+
+const columns = [
+  {
+    field: "Company",
+    title: "Company",
+  }, {
+    field: "Ticker",
+    title: "Ticker"
+  }, {
+    field: "PurchasePrice",
+    title: "Purchase Price",
+    type: 'currency'
+  }, {
+    field: "Shares",
+    title: "Shares",
+    type: 'numeric'
+  }, {
+    field: "CurrentPrice",
+    title: "Current Price",
+    type: 'currency'
+  }, {
+    field: "MarketValue",
+    title: "Market Value",
+    type: 'currency'
+  }, {
+    field: "Gain$",
+    title: "Gain $",
+    type: 'currency'
+  }, {
+    field: "Gain%",
+    title: "Gain %",
+    customSort: (a, b) => parseFloat(a['Gain%'].replace('%', '')) - parseFloat(b['Gain%'].replace('%', ''))
+
+  }
+];
 
 function PortBalance(props) {
     useEffect(() => {
@@ -62,6 +98,7 @@ function PortBalance(props) {
                   <Line key="port" type="monotone" dataKey="Value" dot={false} />
                 </LineChart>
             </ResponsiveContainer>
+            <DataGrid columns={columns} data={props.data}/>
             <ToastContainer
                     position="bottom-center"
                     autoClose={false}
@@ -84,6 +121,7 @@ PortBalance.propTypes = {
         PropTypes.number
     ]))).isRequired,
     purchases: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+    data: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
 };
 
 function TransactionHist(props) {
@@ -105,7 +143,8 @@ export class ChartSelector extends Component {
             {key: 'Portfolio Balance', value: 'Portfolio Balance', label: 'Portfolio Balance'},
             {key: 'Transaction History', value: 'Transaction History', label: 'Transaction History'},
             {key: 'Individual Securities', value: 'Individual Securities', label: 'Individual Securities'},
-            {key: 'Portfolio Diversification', value: 'Portfolio Diversification', label: 'Portfolio Diversification'}]
+            {key: 'Portfolio Diversification', value: 'Portfolio Diversification', label: 'Portfolio Diversification'},
+            {key: 'Add Purchase/Sale', value: 'Add Purchase/Sale', label: 'Add Purchase/Sale'}]
     }
     render() {
         return (
@@ -116,14 +155,7 @@ export class ChartSelector extends Component {
                     onChange={(value) => this.props.changeView(value)}
                     className={'viewSelector'}
                 />
-                <div className={'purchaseButton'}>
-                    <Button
-                        style={{'textTransform': 'none',
-                                'minWidth': '250px'}}
-                        variant="contained"
-                        color="secondary"
-                    >Add Purchase/Sale</Button>
-                </div>
+                <div className={'placeholderDiv'}/>
             </>
         );
     }
@@ -138,6 +170,7 @@ class ChartOverview extends Component{
         if (this.props.chartData.length === 0) {
             this.props.getPortValue(this.props.username);
             this.props.getPurchases(this.props.username);
+            this.props.getPortfolio(this.props.username);
         }
         else {
             toast.dismiss();
@@ -145,20 +178,21 @@ class ChartOverview extends Component{
     }
 
     render() {
-        if (this.props.selectedView === 'Portfolio Balance') {
-            return (<PortBalance chartData={this.props.chartData}
-                                 formattedData={this.props.formattedData}
-                                 type={this.props.type}
-                                 purchases={this.props.purchases}/>);
-        }
-        else if (this.props.selectedView === 'Transaction History') {
-            return (<TransactionHist/>);
-        }
-        else if (this.props.selectedView === 'Individual Securities') {
-            return (<IndSecurities/>)
-        }
-        else {
-            return (<PortDiversity/>)
+        switch (this.props.selectedView) {
+            case "Portfolio Balance":
+                return (<PortBalance chartData={this.props.chartData}
+                                     formattedData={this.props.formattedData}
+                                     type={this.props.type}
+                                     purchases={this.props.purchases}
+                                     data={this.props.portfolioDatagrid}/>);
+            case "Transaction History":
+                return (<TransactionHist/>);
+            case "Individual Securities":
+                return (<IndSecurities/>);
+            case "Portfolio Diversity":
+                return (<PortDiversity/>);
+            default:
+                return (<TransactionForm/>);
         }
     }
 }
@@ -176,8 +210,10 @@ ChartOverview.PropType = {
         PropTypes.number
     ]))).isRequired,
     purchases: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+    portfolioDatagrid: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
     getPortValue: PropTypes.func.isRequired,
     getPurchases: PropTypes.func.isRequired,
+    getPortfolio: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -187,6 +223,7 @@ const mapStateToProps = state => ({
     chartData: state.personalInv.chartData,
     formattedData: state.personalInv.formattedData,
     purchases: state.personalInv.purchases,
+    portfolioDatagrid: state.personalInv.portfolioDatagrid,
 });
 
-export default connect(mapStateToProps, {getPortValue, getPurchases})(ChartOverview);
+export default connect(mapStateToProps, {getPortValue, getPurchases, getPortfolio})(ChartOverview);

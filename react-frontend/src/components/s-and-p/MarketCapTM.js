@@ -29,12 +29,14 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 class MarketCapTM extends Component {
     componentDidMount() {
-        toast.success("Loading, please wait");
+        setTimeout(function() {
+            toast.success("Loading, please wait");
+        }, 0);
         this.props.getTreemapData();
     }
 
     render() {
-        if (this.props.chartData !== {}) {
+        if (Object.keys(this.props.chartData).length !== 0) {
             toast.dismiss();
         }
         return (

@@ -165,14 +165,16 @@ def load_portfolio():
     return all_data
 
 
-@app.route('/loadPortfolioDataGrid')
+@app.route('/loadPortfolioDataGrid', methods=["POST"])
 def get_portfolio():
-    sec_ids = get_port_secs(session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
+    sec_ids = get_port_secs(user_id)
     data = []
     for i in sec_ids:
         name = get_name_from_id(i)
         ticker = get_ticker_from_id(i)
-        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        purchase_price, shares = get_purchase(user_id, i)
         current_price = get_price_today(i)
         if shares <= 0:
             continue
@@ -184,7 +186,7 @@ def get_portfolio():
              "CurrentPrice": current_price,
              "MarketValue": current_price*shares,
              "Gain$": (current_price-purchase_price)*shares,
-             "Gain%": (current_price-purchase_price)*shares/(purchase_price*shares)
+             "Gain%": "{:.2f}".format(((current_price-purchase_price)*shares/(purchase_price*shares))*100) + '%'
              }
         )
     return jsonify(data)

@@ -5,7 +5,7 @@ import {
     CREATE_FAILURE,
     LOGOUT,
     PERSONAL_INV_VIEW,
-    PORTFOLIO_LOADED, FORMAT_DATA, PURCHASES_LOADED
+    PORTFOLIO_LOADED, FORMAT_DATA, PURCHASES_LOADED, PORT_DATAGRID_LOADED
 } from '../actions/types'
 
 const initialState = {
@@ -17,6 +17,7 @@ const initialState = {
     chartData: [],
     formattedData: [],
     purchases: [],
+    portfolioDatagrid: [],
     type: '$',
     time: 'all'
 };
@@ -62,6 +63,9 @@ function personalInv(state = initialState, action) {
         case PURCHASES_LOADED:
             return {...state,
                 purchases: action.payload};
+        case PORT_DATAGRID_LOADED:
+            return {...state,
+                portfolioDatagrid: action.payload};
         default:
             return state;
     }

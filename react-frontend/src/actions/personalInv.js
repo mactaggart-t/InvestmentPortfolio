@@ -3,7 +3,13 @@ import {
     LOGIN_FAILURE,
     LOGOUT,
     API_BASE_URL,
-    NETWORK_ERROR, CREATE_SUCCESS, CREATE_FAILURE, PERSONAL_INV_VIEW, PORTFOLIO_LOADED, PURCHASES_LOADED,
+    NETWORK_ERROR,
+    CREATE_SUCCESS,
+    CREATE_FAILURE,
+    PERSONAL_INV_VIEW,
+    PORTFOLIO_LOADED,
+    PURCHASES_LOADED,
+    PORT_DATAGRID_LOADED,
 } from "./types";
 import axios from "axios";
 
@@ -94,6 +100,22 @@ export const getPurchases = (username) => (dispatch) => {
             dispatch({
                 type: PURCHASES_LOADED,
                 payload: res.data.purchase,
+            });
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
+};
+
+export const getPortfolio = (username) => (dispatch) => {
+    instance
+        .post('/loadPortfolioDataGrid', {username: username})
+        .then((res) => {
+            dispatch({
+                type: PORT_DATAGRID_LOADED,
+                payload: res.data,
             });
         })
         .catch((err) => {
