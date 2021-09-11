@@ -10,6 +10,10 @@ import {
     PORTFOLIO_LOADED,
     PURCHASES_LOADED,
     PORT_DATAGRID_LOADED,
+    TRANSACTION_SUCCESS,
+    TRANSACTION_BAD_SELL,
+    TRANSACTION_EXIST,
+    TRANSACTION_SAMPLE, TRANSACTION_SUBMISSION, TRANSACTION_COMPLETE
 } from "./types";
 import axios from "axios";
 
@@ -123,4 +127,50 @@ export const getPortfolio = (username) => (dispatch) => {
                 type: NETWORK_ERROR
             })
         });
+};
+
+export const addTransaction = (username, ticker, buyOrSell, price, shares, date) => (dispatch) => {
+    instance
+        .post('/newTransaction', {username: username, ticker: ticker, buy_sell: buyOrSell,
+            price: price, shares: shares, dt: date})
+        .then((res) => {
+            switch (res.data) {
+                case 'no sample':
+                    dispatch({
+                        type: TRANSACTION_SAMPLE,
+                    });
+                    break;
+                case 'no exist':
+                    dispatch({
+                        type: TRANSACTION_EXIST,
+                    });
+                    break;
+                case 'invalid sell':
+                    dispatch({
+                        type: TRANSACTION_BAD_SELL
+                    });
+                    break;
+                default:
+                    dispatch({
+                        type: TRANSACTION_SUCCESS,
+                    });
+            }
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
+};
+
+export const transactionSubmission = (typeSubmit) => (dispatch) => {
+    if (typeSubmit === 'starting') {
+        dispatch({
+            type: TRANSACTION_SUBMISSION,
+        });
+    } else {
+        dispatch({
+            type: TRANSACTION_COMPLETE,
+        });
+    }
 };

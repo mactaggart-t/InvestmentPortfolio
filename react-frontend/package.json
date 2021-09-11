@@ -12,6 +12,7 @@
     "autoprefixer": "latest",
     "axios": "^0.21.1",
     "connected-react-router": "latest",
+    "formik": "^2.2.9",
     "history": "latest",
     "material-table": "^1.69.3",
     "multiselect-react-dropdown": "latest",
@@ -33,7 +34,8 @@
     "redux": "latest",
     "redux-thunk": "latest",
     "web-vitals": "^1.1.2",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "yup": "^0.32.9"
   },
   "scripts": {
     "start": "react-scripts start",

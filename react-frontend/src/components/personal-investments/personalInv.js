@@ -16,7 +16,7 @@ class PersonalInv extends Component {
             <>
                 <Header selected={'personalInv'}/>
                 <div className="headerStyle">
-                    <h1 id="headerText">{"Hello " + this.props.username}</h1>
+                    <h1 id="headerText">{"Hello, " + this.props.username}</h1>
                 </div>
                 <ChartSelector changeView={this.props.changeView}/>
                 <ChartOverview />

@@ -5,7 +5,16 @@ import {
     CREATE_FAILURE,
     LOGOUT,
     PERSONAL_INV_VIEW,
-    PORTFOLIO_LOADED, FORMAT_DATA, PURCHASES_LOADED, PORT_DATAGRID_LOADED
+    PORTFOLIO_LOADED,
+    FORMAT_DATA,
+    PURCHASES_LOADED,
+    PORT_DATAGRID_LOADED,
+    TRANSACTION_SUCCESS,
+    TRANSACTION_BAD_SELL,
+    TRANSACTION_EXIST,
+    TRANSACTION_SAMPLE,
+    TRANSACTION_SUBMISSION,
+    TRANSACTION_COMPLETE
 } from '../actions/types'
 
 const initialState = {
@@ -19,7 +28,9 @@ const initialState = {
     purchases: [],
     portfolioDatagrid: [],
     type: '$',
-    time: 'all'
+    time: 'all',
+    transactionResponse: '',
+    transactionSubmitting: false
 };
 
 function personalInv(state = initialState, action) {
@@ -46,8 +57,18 @@ function personalInv(state = initialState, action) {
         case LOGOUT:
             return { ...state,
                 isLoggedIn: false,
-                loginFailed: true,
-                username: ''};
+                loginFailed: false,
+                duplicateAccount: true,
+                username: '',
+                selectedView: 'Portfolio Balance',
+                chartData: [],
+                formattedData: [],
+                purchases: [],
+                portfolioDatagrid: [],
+                type: '$',
+                time: 'all',
+                transactionResponse: ''
+                };
         case PERSONAL_INV_VIEW:
             return { ...state,
                 selectedView: action.payload};
@@ -66,6 +87,23 @@ function personalInv(state = initialState, action) {
         case PORT_DATAGRID_LOADED:
             return {...state,
                 portfolioDatagrid: action.payload};
+        case TRANSACTION_SUCCESS:
+            return {...state,
+                transactionResponse: 'success'};
+        case TRANSACTION_SAMPLE:
+            return {...state,
+                transactionResponse: 'no sample'};
+        case TRANSACTION_EXIST:
+            return {...state,
+                transactionResponse: 'no exist'};
+        case TRANSACTION_BAD_SELL:
+            return {...state,
+                transactionResponse: 'bad sell'};
+        case TRANSACTION_SUBMISSION:
+            return {...state,
+                transactionSubmitting: true, transactionResponse: ''};
+        case TRANSACTION_COMPLETE:
+            return {...state, transactionSubmitting: false};
         default:
             return state;
     }

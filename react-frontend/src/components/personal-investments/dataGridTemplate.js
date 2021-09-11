@@ -42,7 +42,7 @@ export default class DataGrid extends Component {
       return (
           <MaterialTable
               icons={tableIcons}
-              title="Portfolio"
+              title={this.props.title}
               columns={this.props.columns}
               data={this.props.data}
               options={{sorting: true, search: false, pageSize: 10, pageSizeOptions: [5, 10, 20, 50]}}
@@ -52,6 +52,7 @@ export default class DataGrid extends Component {
 }
 
 DataGrid.PropType = {
-  columns: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
-  data: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+    columns: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+    data: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+    title: PropTypes.string.isRequired,
 };

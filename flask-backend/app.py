@@ -112,36 +112,44 @@ def get_username():
     return session.get('username')
 
 
-@app.route('/newTransaction')
+@app.route('/newTransaction', methods=['POST'])
 def new_transaction():
-    if session.get('username') == 'Sample':
-        return 'no sample'
-    user = session.get('user_id')
-    ticker = request.args['ticker']
-    buy = request.args['buy_sell'] == "Buy"
-    price = request.args['price']
-    shares = int(request.args['shares'])
-    dt = request.args['dt']
-    dt = datetime.strptime(dt[0:15], '%a %b %d %Y').date()
+    username = request.json['username']
+    if username == 'Sample':
+        return jsonify('no sample')
+    user_id = get_user_id(username)
+    ticker = request.json['ticker']
+    buy = request.json['buy_sell'] == "Buy"
+    price = request.json['price']
+    shares = request.json['shares']
+    dt = request.json['dt']
+    dt = datetime.strptime(dt[0:9], '%Y-%m-%d').date()
+    logger.info(username)
+    logger.info(user_id)
+    logger.info(ticker)
+    logger.info(buy)
+    logger.info(price)
+    logger.info(shares)
+    logger.info(dt)
     sec_id = get_security_id(ticker)
     if sec_id is None:
-        if ticker_exists(ticker):
-            add_security(ticker, get_name(ticker), get_sector(ticker),
-                         get_industry(ticker))
-            sec_id = get_security_id(ticker)
-            dates, prices = get_historic_data(ticker, datetime.today().timestamp(),
-                                              datetime(2000, 1, 1, 0, 0).timestamp())
-            add_historic_price(sec_id, prices, dates)
-        else:
-            return 'no exist'
+        # if ticker_exists(ticker):
+        #     add_security(ticker, get_name(ticker), get_sector(ticker),
+        #                  get_industry(ticker))
+        #     sec_id = get_security_id(ticker)
+        #     dates, prices = get_historic_data(ticker, datetime.today().timestamp(),
+        #                                       datetime(2000, 1, 1, 0, 0).timestamp())
+        #     add_historic_price(sec_id, prices, dates)
+        # else:
+        return jsonify('no exist')
     if not buy:
-        if check_valid_sell(shares, sec_id, user, dt):
-            add_purchase(sec_id, user, dt, price, buy, shares)
-            return 'valid sell'
+        if check_valid_sell(shares, sec_id, user_id, dt):
+            add_purchase(sec_id, user_id, dt, price, buy, shares)
+            return jsonify('valid sell')
         else:
-            return 'invalid sell'
-    add_purchase(sec_id, user, dt, price, buy, shares)
-    return 'success'
+            return jsonify('invalid sell')
+    add_purchase(sec_id, user_id, dt, price, buy, shares)
+    return jsonify('success')
 
 
 @app.route('/loadPortfolio', methods=["POST"])

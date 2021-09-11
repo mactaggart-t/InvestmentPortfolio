@@ -69,3 +69,32 @@
     border: 1px solid gray;
     text-align: center;
 }
+
+.purchaseLabel {
+    float: left;
+}
+
+.purchaseBox {
+    border-radius: 10px;
+    outline: 1px solid #1abc9c;
+    perspective: 1px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    text-align: center;
+    min-width: 350px;
+    max-width: 35%;
+}
+
+.purchaseInput {
+    margin: 10px;
+}
+
+.purchaseRadio {
+    margin: 10px auto 10px auto;
+    width: 100%;
+    text-align: center;
+}

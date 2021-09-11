@@ -1,128 +1,18 @@
-import React, {Component, useEffect} from 'react';
+import React, {Component} from 'react';
 import Select from "react-dropdown-select";
 import {connect} from "react-redux";
 import './personalInv.css';
 import PropTypes from "prop-types";
-import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
-import {formatXAxis} from "../../actions/chartingUtils";
-import {getPortfolio, getPortValue, getPurchases} from "../../actions/personalInv";
-import Selectors from "./selectors";
-import DataGrid from "./dataGridTemplate";
+import {
+    addTransaction,
+    getPortfolio,
+    getPortValue,
+    getPurchases,
+    transactionSubmission
+} from "../../actions/personalInv";
 import {TransactionForm} from './purchaseLogging';
-import {ToastContainer, toast} from "react-toastify";
-
-const CustomTooltip = (content) => {
-    if (content.active && content.payload && content.payload.length) {
-        if (content.type === '$') {
-            return (
-                <div className={'tooltipBackground'}>
-                    <p>{formatXAxis(content.payload[0].payload.date)}</p>
-                    <p>{`$${content.payload[0].payload.Value.toFixed(2)}`}</p>
-                </div>
-            );
-        }
-        else {
-            return (
-                <div className={'tooltipBackground'}>
-                    <p>{formatXAxis(content.payload[0].payload.date)}</p>
-                    <p>{`${content.payload[0].payload.Value.toFixed(2)}%`}</p>
-                </div>
-            )
-        }
-    }
-    return null;
-};
-
-const columns = [
-  {
-    field: "Company",
-    title: "Company",
-  }, {
-    field: "Ticker",
-    title: "Ticker"
-  }, {
-    field: "PurchasePrice",
-    title: "Purchase Price",
-    type: 'currency'
-  }, {
-    field: "Shares",
-    title: "Shares",
-    type: 'numeric'
-  }, {
-    field: "CurrentPrice",
-    title: "Current Price",
-    type: 'currency'
-  }, {
-    field: "MarketValue",
-    title: "Market Value",
-    type: 'currency'
-  }, {
-    field: "Gain$",
-    title: "Gain $",
-    type: 'currency'
-  }, {
-    field: "Gain%",
-    title: "Gain %",
-    customSort: (a, b) => parseFloat(a['Gain%'].replace('%', '')) - parseFloat(b['Gain%'].replace('%', ''))
-
-  }
-];
-
-function PortBalance(props) {
-    useEffect(() => {
-        toast.dismiss();
-        if (props.chartData.length === 0) {
-            toast.success('Loading, please wait...');
-        }
-    });
-    return (
-        <>
-            <h4 className="chartTitle">Portfolio Value</h4>
-            <Selectors purchases={props.purchases}/>
-            <ResponsiveContainer width="95%" height="60%">
-                <LineChart
-                  width={800}
-                  data={props.formattedData}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 30,
-                    bottom: 50,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" label={{ value: "Date", dy: -27}} tickFormatter={formatXAxis} angle={45}  dy={25}/>
-                  <YAxis label={{ value: (props.type === '$') ? "Price($)": "Change(%)", angle: -90, dx: 40 }}
-                         tickFormatter={t => (props.type === '$') ? "$" + t : t + '%'}/>
-                  <Tooltip content={<CustomTooltip type={props.type}/>} labelFormatter={t => new Date(t).toLocaleString().split(',')[0]}/>
-                  <Line key="port" type="monotone" dataKey="Value" dot={false} />
-                </LineChart>
-            </ResponsiveContainer>
-            <DataGrid columns={columns} data={props.data}/>
-            <ToastContainer
-                    position="bottom-center"
-                    autoClose={false}
-                    hideProgressBar={true}
-                    draggable
-                    pauseOnHover
-            />
-        </>
-    );
-}
-
-PortBalance.propTypes = {
-    type: PropTypes.string.isRequired,
-    chartData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number
-    ]))).isRequired,
-    formattedData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number
-    ]))).isRequired,
-    purchases: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
-    data: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
-};
+import {PortBalance} from './portBalance'
+import {toast} from "react-toastify";
 
 function TransactionHist(props) {
     return (<></>);
@@ -192,7 +82,11 @@ class ChartOverview extends Component{
             case "Portfolio Diversity":
                 return (<PortDiversity/>);
             default:
-                return (<TransactionForm/>);
+                return (<TransactionForm addTransaction={this.props.addTransaction}
+                                         transactionResponse={this.props.transactionResponse}
+                                         username={this.props.username}
+                                         transactionSubmission={this.props.transactionSubmission}
+                                         transactionSubmitting={this.props.transactionSubmitting}/>);
         }
     }
 }
@@ -211,9 +105,13 @@ ChartOverview.PropType = {
     ]))).isRequired,
     purchases: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
     portfolioDatagrid: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+    transactionResponse: PropTypes.string.isRequired,
+    transactionSubmitting: PropTypes.bool.isRequired,
     getPortValue: PropTypes.func.isRequired,
     getPurchases: PropTypes.func.isRequired,
     getPortfolio: PropTypes.func.isRequired,
+    addTransaction: PropTypes.func.isRequired,
+    transactionSubmission: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -224,6 +122,9 @@ const mapStateToProps = state => ({
     formattedData: state.personalInv.formattedData,
     purchases: state.personalInv.purchases,
     portfolioDatagrid: state.personalInv.portfolioDatagrid,
+    transactionResponse: state.personalInv.transactionResponse,
+    transactionSubmitting: state.personalInv.transactionSubmitting
 });
 
-export default connect(mapStateToProps, {getPortValue, getPurchases, getPortfolio})(ChartOverview);
+export default connect(mapStateToProps,
+    {getPortValue, getPurchases, getPortfolio, addTransaction, transactionSubmission})(ChartOverview);
