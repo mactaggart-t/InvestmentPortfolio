@@ -98,3 +98,7 @@
     width: 100%;
     text-align: center;
 }
+
+.MuiPaper-root {
+    z-index: 0;
+}

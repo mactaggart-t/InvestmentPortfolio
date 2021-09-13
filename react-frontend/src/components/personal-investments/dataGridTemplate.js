@@ -45,6 +45,7 @@ export default class DataGrid extends Component {
               title={this.props.title}
               columns={this.props.columns}
               data={this.props.data}
+              emptyRowsWhenPaging={false }
               options={{sorting: true, search: false, pageSize: 10, pageSizeOptions: [5, 10, 20, 50]}}
           />
       );

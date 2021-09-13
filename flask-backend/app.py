@@ -200,9 +200,10 @@ def get_portfolio():
     return jsonify(data)
 
 
-@app.route('/loadTransactionHistory')
+@app.route('/loadTransactionHistory', methods=['POST'])
 def load_transaction_history():
-    user_id = (session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
     data = get_transaction_history(user_id)
     return jsonify(data)
 

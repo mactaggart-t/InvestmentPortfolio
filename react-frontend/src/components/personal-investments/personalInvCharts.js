@@ -7,16 +7,50 @@ import {
     addTransaction,
     getPortfolio,
     getPortValue,
-    getPurchases,
+    getPurchases, getTransactHist,
     transactionSubmission
 } from "../../actions/personalInv";
 import {TransactionForm} from './purchaseLogging';
 import {PortBalance} from './portBalance'
+import DataGrid from "./dataGridTemplate";
 import {toast} from "react-toastify";
 
+const transactHistCols = [
+  {
+    field: "Company",
+    title: "Company",
+  }, {
+    field: "Ticker",
+    title: "Ticker"
+  }, {
+    field: "PurchaseOrSale",
+    title: "Purchase Or Sale",
+  }, {
+    field: "PurchaseOrSalePrice",
+    title: "Purchase Or Sale Price",
+    type: 'currency'
+  }, {
+    field: "Shares",
+    title: "Shares",
+    type: 'numeric'
+  }, {
+    field: "PurchaseOrSaleDate",
+    title: "Purchase Or Sale Date",
+    type: 'date'
+  },
+];
+
 function TransactionHist(props) {
-    return (<></>);
+    return (
+        <>
+            <h4 className="chartTitle">Transaction History</h4>
+            <DataGrid style={{position: 'relative'}} columns={transactHistCols} data={props.transactHist} title={''}/>
+        </>);
 }
+
+TransactionHist.propTypes = {
+    transactHist: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+};
 
 function IndSecurities(props) {
     return (<></>);
@@ -61,6 +95,7 @@ class ChartOverview extends Component{
             this.props.getPortValue(this.props.username);
             this.props.getPurchases(this.props.username);
             this.props.getPortfolio(this.props.username);
+            this.props.getTransactHist(this.props.username);
         }
         else {
             toast.dismiss();
@@ -76,10 +111,10 @@ class ChartOverview extends Component{
                                      purchases={this.props.purchases}
                                      data={this.props.portfolioDatagrid}/>);
             case "Transaction History":
-                return (<TransactionHist/>);
+                return (<TransactionHist transactHist={this.props.transactHist}/>);
             case "Individual Securities":
                 return (<IndSecurities/>);
-            case "Portfolio Diversity":
+            case "Portfolio Diversification":
                 return (<PortDiversity/>);
             default:
                 return (<TransactionForm addTransaction={this.props.addTransaction}
@@ -107,11 +142,13 @@ ChartOverview.PropType = {
     portfolioDatagrid: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
     transactionResponse: PropTypes.string.isRequired,
     transactionSubmitting: PropTypes.bool.isRequired,
+    transactHist: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
     getPortValue: PropTypes.func.isRequired,
     getPurchases: PropTypes.func.isRequired,
     getPortfolio: PropTypes.func.isRequired,
     addTransaction: PropTypes.func.isRequired,
     transactionSubmission: PropTypes.func.isRequired,
+    getTransactHist: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -123,8 +160,9 @@ const mapStateToProps = state => ({
     purchases: state.personalInv.purchases,
     portfolioDatagrid: state.personalInv.portfolioDatagrid,
     transactionResponse: state.personalInv.transactionResponse,
-    transactionSubmitting: state.personalInv.transactionSubmitting
+    transactionSubmitting: state.personalInv.transactionSubmitting,
+    transactHist: state.personalInv.transactHist,
 });
 
 export default connect(mapStateToProps,
-    {getPortValue, getPurchases, getPortfolio, addTransaction, transactionSubmission})(ChartOverview);
+    {getPortValue, getPurchases, getPortfolio, addTransaction, transactionSubmission, getTransactHist})(ChartOverview);

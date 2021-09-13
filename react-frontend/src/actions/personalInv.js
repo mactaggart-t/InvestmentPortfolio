@@ -13,7 +13,7 @@ import {
     TRANSACTION_SUCCESS,
     TRANSACTION_BAD_SELL,
     TRANSACTION_EXIST,
-    TRANSACTION_SAMPLE, TRANSACTION_SUBMISSION, TRANSACTION_COMPLETE
+    TRANSACTION_SAMPLE, TRANSACTION_SUBMISSION, TRANSACTION_COMPLETE, TRANSACTION_HIST_LOADED
 } from "./types";
 import axios from "axios";
 
@@ -173,4 +173,23 @@ export const transactionSubmission = (typeSubmit) => (dispatch) => {
             type: TRANSACTION_COMPLETE,
         });
     }
+};
+
+export const getTransactHist = (username) => (dispatch) => {
+    instance
+        .post('/loadTransactionHistory', {username: username})
+        .then((res) => {
+            for (let i = 0; i < res.data.length; i++) {
+                res.data[i]['PurchaseOrSaleDate'] = new Date(res.data[i]['PurchaseOrSaleDate']);
+            }
+            dispatch({
+                type: TRANSACTION_HIST_LOADED,
+                payload: res.data,
+            });
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
 };

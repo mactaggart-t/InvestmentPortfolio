@@ -32,6 +32,7 @@ export const TRANSACTION_EXIST = 'TRANSACTION_EXIST';
 export const TRANSACTION_BAD_SELL = 'TRANSACTION_BAD_SELL';
 export const TRANSACTION_SUBMISSION = 'TRANSACTION_SUBMISSION';
 export const TRANSACTION_COMPLETE = 'TRANSACTION_COMPLETE';
+export const TRANSACTION_HIST_LOADED = 'TRANSACTION_HIST_LOADED';
 export const API_BASE_URL = 'http://localhost:5000';
 export const TWOW = deltaDate(today, -14, 0, 0);
 export const ONEM = deltaDate(today, 0, -1, 0);

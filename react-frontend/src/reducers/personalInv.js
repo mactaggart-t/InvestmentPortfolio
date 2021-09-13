@@ -14,7 +14,7 @@ import {
     TRANSACTION_EXIST,
     TRANSACTION_SAMPLE,
     TRANSACTION_SUBMISSION,
-    TRANSACTION_COMPLETE
+    TRANSACTION_COMPLETE, TRANSACTION_HIST_LOADED
 } from '../actions/types'
 
 const initialState = {
@@ -30,7 +30,8 @@ const initialState = {
     type: '$',
     time: 'all',
     transactionResponse: '',
-    transactionSubmitting: false
+    transactionSubmitting: false,
+    transactHist: [],
 };
 
 function personalInv(state = initialState, action) {
@@ -104,6 +105,8 @@ function personalInv(state = initialState, action) {
                 transactionSubmitting: true, transactionResponse: ''};
         case TRANSACTION_COMPLETE:
             return {...state, transactionSubmitting: false};
+        case TRANSACTION_HIST_LOADED:
+            return {...state, transactHist: action.payload};
         default:
             return state;
     }
