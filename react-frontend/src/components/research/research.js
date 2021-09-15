@@ -10,7 +10,7 @@ import Header from "../header/header"
 import {getAllTickers, submitSelectedTickers} from "../../actions/research";
 import './research.css'
 import 'react-toastify/dist/ReactToastify.min.css';
-import {formatXAxis, getStroke} from "../../actions/chartingUtils";
+import {CustomTooltip, formatXAxis, getStroke} from "../../actions/chartingUtils";
 
 function StockChart(props) {
 
@@ -33,7 +33,7 @@ function StockChart(props) {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" label={{ value: "Date", dy: -27}} tickFormatter={formatXAxis} angle={45}  dy={25}/>
                   <YAxis label={{ value: (props.type === '$') ? "Price($)": "Change(%)", angle: -90, dx: 40 }} tickFormatter={t => (props.type === '$') ? "$" + t : t + '%'}/>
-                  <Tooltip labelFormatter={t => new Date(t).toLocaleString().split(',')[0]}/>
+                  <Tooltip content={<CustomTooltip type={props.type}/>} labelFormatter={t => new Date(t).toLocaleString().split(',')[0]}/>
                   <Legend verticalAlign="top"/>
                   {props.selected.map(ticker => (
                       <Line key={ticker} type="monotone" dataKey={ticker} dot={false} stroke={getStroke(props.selected.indexOf(ticker))}/>

@@ -5,13 +5,14 @@ import './personalInv.css';
 import PropTypes from "prop-types";
 import {
     addTransaction,
-    getPortfolio,
+    getPortfolio, getPortfolioTickers,
     getPortValue,
-    getPurchases, getTransactHist,
+    getPurchases, getTransactHist, resetLoaded, submitSelectedTickers,
     transactionSubmission
 } from "../../actions/personalInv";
 import {TransactionForm} from './purchaseLogging';
 import {PortBalance} from './portBalance'
+import {IndSecurities} from './indSecurities'
 import DataGrid from "./dataGridTemplate";
 import {toast} from "react-toastify";
 
@@ -52,10 +53,6 @@ TransactionHist.propTypes = {
     transactHist: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
 };
 
-function IndSecurities(props) {
-    return (<></>);
-}
-
 function PortDiversity(props) {
     return (<></>);
 }
@@ -95,7 +92,12 @@ class ChartOverview extends Component{
             this.props.getPortValue(this.props.username);
             this.props.getPurchases(this.props.username);
             this.props.getPortfolio(this.props.username);
+        }
+        if (this.props.transactHist.length === 0) {
             this.props.getTransactHist(this.props.username);
+        }
+        if (this.props.chartDataInd.length === 0) {
+            this.props.getPortfolioTickers(this.props.username);
         }
         else {
             toast.dismiss();
@@ -109,11 +111,14 @@ class ChartOverview extends Component{
                                      formattedData={this.props.formattedData}
                                      type={this.props.type}
                                      purchases={this.props.purchases}
-                                     data={this.props.portfolioDatagrid}/>);
+                                     data={this.props.portfolioDatagrid} time={this.props.time}/>);
             case "Transaction History":
                 return (<TransactionHist transactHist={this.props.transactHist}/>);
             case "Individual Securities":
-                return (<IndSecurities/>);
+                return (<IndSecurities selected={this.props.selected} type={this.props.typeInd} time={this.props.timeInd}
+                           chartData={this.props.chartDataInd} formattedData={this.props.formattedDataInd}
+                           items={this.props.items} submitSelectedTickers={this.props.submitSelectedTickers}
+                                       loadedInd={this.props.loadedInd} resetLoaded={this.props.resetLoaded}/>);
             case "Portfolio Diversification":
                 return (<PortDiversity/>);
             default:
@@ -130,6 +135,7 @@ ChartOverview.PropType = {
     selectedView: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    time: PropTypes.string.isRequired,
     chartData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number
@@ -143,18 +149,34 @@ ChartOverview.PropType = {
     transactionResponse: PropTypes.string.isRequired,
     transactionSubmitting: PropTypes.bool.isRequired,
     transactHist: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+    selected: PropTypes.arrayOf(PropTypes.string).isRequired,
+    typeInd: PropTypes.string.isRequired,
+    timeInd: PropTypes.string.isRequired,
+    chartDataInd: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]))).isRequired,
+    formattedDataInd: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]))).isRequired,
+    items: PropTypes.arrayOf(PropTypes.string).isRequired,
+    loadedInd: PropTypes.bool.isRequired,
+    submitSelectedTickers: PropTypes.func.isRequired,
     getPortValue: PropTypes.func.isRequired,
     getPurchases: PropTypes.func.isRequired,
     getPortfolio: PropTypes.func.isRequired,
     addTransaction: PropTypes.func.isRequired,
     transactionSubmission: PropTypes.func.isRequired,
     getTransactHist: PropTypes.func.isRequired,
+    getPortfolioTickers: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
     selectedView: state.personalInv.selectedView,
     username: state.personalInv.username,
     type: state.personalInv.type,
+    time: state.personalInv.time,
     chartData: state.personalInv.chartData,
     formattedData: state.personalInv.formattedData,
     purchases: state.personalInv.purchases,
@@ -162,7 +184,16 @@ const mapStateToProps = state => ({
     transactionResponse: state.personalInv.transactionResponse,
     transactionSubmitting: state.personalInv.transactionSubmitting,
     transactHist: state.personalInv.transactHist,
+    selected: state.personalInv.selected,
+    typeInd: state.personalInv.typeInd,
+    timeInd: state.personalInv.timeInd,
+    chartDataInd: state.personalInv.chartDataInd,
+    formattedDataInd: state.personalInv.formattedDataInd,
+    items: state.personalInv.items,
+    loadedInd: state.personalInv.loadedInd,
+
 });
 
-export default connect(mapStateToProps,
-    {getPortValue, getPurchases, getPortfolio, addTransaction, transactionSubmission, getTransactHist})(ChartOverview);
+export default connect(mapStateToProps, {getPortValue, getPurchases, getPortfolio,
+    addTransaction, transactionSubmission, getTransactHist,
+    getPortfolioTickers, submitSelectedTickers, resetLoaded})(ChartOverview);

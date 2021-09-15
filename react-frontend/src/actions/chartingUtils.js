@@ -1,4 +1,5 @@
-import {FIVEY, FORMAT_DATA, ONEM, ONEY, SIXM, TENY, THREEM, TWOW, YTD} from "./types";
+import {FIVEY, FORMAT_DATA, FORMAT_DATA_IND, ONEM, ONEY, SIXM, TENY, THREEM, TWOW, YTD} from "./types";
+import React from "react";
 
 export function getFormattedDate(date) {
     const year = date.getFullYear();
@@ -106,8 +107,38 @@ export const formatData = (fullData, time, type, chartType, purchases=[]) => (di
             formattedData = reformattedData;
         }
     }
-    dispatch({
-        type: FORMAT_DATA,
-        payload: {formattedData: formattedData, time: time, type: type},
-    });
+    if (chartType === 'individual') {
+        dispatch({
+            type: FORMAT_DATA_IND,
+            payload: {formattedData: formattedData, time: time, type: type},
+        });
+    } else {
+        dispatch({
+            type: FORMAT_DATA,
+            payload: {formattedData: formattedData, time: time, type: type},
+        });
+    }
+};
+
+export const CustomTooltip = (content) => {
+    if (content.active && content.payload && content.payload.length) {
+        console.log(content.payload);
+        if (content.type === '$') {
+            return (
+                <div className={'tooltipBackground'}>
+                    <p>{formatXAxis(content.payload[0].payload.date)}</p>
+                    {content.payload.map(ticker => (<p>{`${ticker.name}: $${ticker.value.toFixed(2)}`}</p>))}
+                </div>
+            );
+        }
+        else {
+            return (
+                <div className={'tooltipBackground'}>
+                    <p>{formatXAxis(content.payload[0].payload.date)}</p>
+                    {content.payload.map(ticker => (<p>{`${ticker.name}: ${ticker.value.toFixed(2)}%`}</p>))}
+                </div>
+            )
+        }
+    }
+    return null;
 };

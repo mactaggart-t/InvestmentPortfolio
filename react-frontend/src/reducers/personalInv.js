@@ -14,7 +14,12 @@ import {
     TRANSACTION_EXIST,
     TRANSACTION_SAMPLE,
     TRANSACTION_SUBMISSION,
-    TRANSACTION_COMPLETE, TRANSACTION_HIST_LOADED
+    TRANSACTION_COMPLETE,
+    TRANSACTION_HIST_LOADED,
+    IND_SUBMIT_TICKERS,
+    PORT_TICKERS_RETRIEVED,
+    FORMAT_DATA_IND,
+    RESET_LOAD
 } from '../actions/types'
 
 const initialState = {
@@ -32,6 +37,13 @@ const initialState = {
     transactionResponse: '',
     transactionSubmitting: false,
     transactHist: [],
+    selected: [],
+    typeInd: '$',
+    timeInd: 'all',
+    chartDataInd: [],
+    formattedDataInd: [],
+    items: [],
+    loadedInd: false
 };
 
 function personalInv(state = initialState, action) {
@@ -56,20 +68,7 @@ function personalInv(state = initialState, action) {
                 isLoggedIn: false,
                 duplicateAccount: true};
         case LOGOUT:
-            return { ...state,
-                isLoggedIn: false,
-                loginFailed: false,
-                duplicateAccount: true,
-                username: '',
-                selectedView: 'Portfolio Balance',
-                chartData: [],
-                formattedData: [],
-                purchases: [],
-                portfolioDatagrid: [],
-                type: '$',
-                time: 'all',
-                transactionResponse: ''
-                };
+            return initialState;
         case PERSONAL_INV_VIEW:
             return { ...state,
                 selectedView: action.payload};
@@ -107,6 +106,23 @@ function personalInv(state = initialState, action) {
             return {...state, transactionSubmitting: false};
         case TRANSACTION_HIST_LOADED:
             return {...state, transactHist: action.payload};
+        case IND_SUBMIT_TICKERS:
+            return {...state,
+                chartDataInd: action.payload.chartData,
+                selected: action.payload.selected,
+                formattedDataInd: action.payload.chartData,
+                timeInd: 'all',
+                typeInd: '$',
+                loadedInd: true};
+        case PORT_TICKERS_RETRIEVED:
+            return {...state, items: action.payload};
+        case FORMAT_DATA_IND:
+            return {...state,
+                formattedDataInd: action.payload.formattedData,
+                timeInd: action.payload.time,
+                typeInd: action.payload.type};
+        case RESET_LOAD:
+            return {...state, loadedInd: false};
         default:
             return state;
     }

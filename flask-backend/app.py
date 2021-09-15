@@ -66,13 +66,15 @@ def get_treemap_data():
     return jsonify({'marketCapData': market_cap_data, 'allSectors': all_sectors})
 
 
-@app.route('/getPortTickers')
+@app.route('/getPortTickers', methods=['POST'])
 def get_port_tick():
-    sec_ids = get_port_secs(session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
+    sec_ids = get_port_secs(user_id)
     data = []
     for i in sec_ids:
         ticker = get_ticker_from_id(i)
-        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        purchase_price, shares = get_purchase(user_id, i)
         if shares <= 0:
             continue
         data.append(ticker)

@@ -1,32 +1,10 @@
-import {formatXAxis} from "../../actions/chartingUtils";
+import {CustomTooltip, formatXAxis} from "../../actions/chartingUtils";
 import React, {useEffect} from "react";
 import {toast, ToastContainer} from "react-toastify";
 import Selectors from "./selectors";
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import DataGrid from "./dataGridTemplate";
 import PropTypes from "prop-types";
-
-const CustomTooltip = (content) => {
-    if (content.active && content.payload && content.payload.length) {
-        if (content.type === '$') {
-            return (
-                <div className={'tooltipBackground'}>
-                    <p>{formatXAxis(content.payload[0].payload.date)}</p>
-                    <p>{`$${content.payload[0].payload.Value.toFixed(2)}`}</p>
-                </div>
-            );
-        }
-        else {
-            return (
-                <div className={'tooltipBackground'}>
-                    <p>{formatXAxis(content.payload[0].payload.date)}</p>
-                    <p>{`${content.payload[0].payload.Value.toFixed(2)}%`}</p>
-                </div>
-            )
-        }
-    }
-    return null;
-};
 
 const columns = [
   {
@@ -73,7 +51,8 @@ export function PortBalance(props) {
     return (
         <>
             <h4 className="chartTitle">Portfolio Value</h4>
-            <Selectors purchases={props.purchases}/>
+            <Selectors time={props.time} type={props.type} chartData={props.chartData} purchases={props.purchases}
+                       chartType={'portfolio'}/>
             <ResponsiveContainer width="95%" height="60%">
                 <LineChart
                   width={800}
@@ -107,6 +86,7 @@ export function PortBalance(props) {
 
 PortBalance.propTypes = {
     type: PropTypes.string.isRequired,
+    time: PropTypes.string.isRequired,
     chartData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number

@@ -13,7 +13,11 @@ import {
     TRANSACTION_SUCCESS,
     TRANSACTION_BAD_SELL,
     TRANSACTION_EXIST,
-    TRANSACTION_SAMPLE, TRANSACTION_SUBMISSION, TRANSACTION_COMPLETE, TRANSACTION_HIST_LOADED
+    TRANSACTION_SAMPLE,
+    TRANSACTION_SUBMISSION,
+    TRANSACTION_COMPLETE,
+    TRANSACTION_HIST_LOADED,
+    IND_SUBMIT_TICKERS, PORT_TICKERS_RETRIEVED, RESET_LOAD
 } from "./types";
 import axios from "axios";
 
@@ -192,4 +196,42 @@ export const getTransactHist = (username) => (dispatch) => {
                 type: NETWORK_ERROR
             })
         });
+};
+
+export const submitSelectedTickers = (selectedTickers) => (dispatch) => {
+    instance
+        .post('/api/getTickerValues', {'selected': selectedTickers})
+        .then((res) => {
+            dispatch({
+                type: IND_SUBMIT_TICKERS,
+                payload: res.data,
+            });
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
+};
+
+export const getPortfolioTickers = (username) => (dispatch) => {
+    instance
+        .post('/getPortTickers', {'username': username})
+        .then((res) => {
+            dispatch({
+                type: PORT_TICKERS_RETRIEVED,
+                payload: res.data,
+            });
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
+};
+
+export const resetLoaded = () => (dispatch) => {
+  dispatch({
+      type: RESET_LOAD,
+  })
 };
