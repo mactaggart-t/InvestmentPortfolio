@@ -17,7 +17,7 @@ import {
     TRANSACTION_SUBMISSION,
     TRANSACTION_COMPLETE,
     TRANSACTION_HIST_LOADED,
-    IND_SUBMIT_TICKERS, PORT_TICKERS_RETRIEVED, RESET_LOAD
+    IND_SUBMIT_TICKERS, PORT_TICKERS_RETRIEVED, RESET_LOAD, SEC_DIV_RETRIEVED, SECTOR_DIV_RETRIEVED
 } from "./types";
 import axios from "axios";
 
@@ -234,4 +234,33 @@ export const resetLoaded = () => (dispatch) => {
   dispatch({
       type: RESET_LOAD,
   })
+};
+
+export const loadPortDiversity = (username) => (dispatch) => {
+    instance
+        .post('/loadSecDistribution', {'username': username})
+        .then((res) => {
+            dispatch({
+                type: SEC_DIV_RETRIEVED,
+                payload: res.data,
+            });
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
+    instance
+        .post('/loadSectorDistribution', {'username': username})
+        .then((res) => {
+            dispatch({
+                type: SECTOR_DIV_RETRIEVED,
+                payload: res.data,
+            });
+        })
+        .catch((err) => {
+            dispatch({
+                type: NETWORK_ERROR
+            })
+        });
 };

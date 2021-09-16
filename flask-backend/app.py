@@ -210,33 +210,37 @@ def load_transaction_history():
     return jsonify(data)
 
 
-@app.route('/loadSecDistribution')
+@app.route('/loadSecDistribution', methods=['POST'])
 def load_sec_distribution():
-    sec_ids = get_port_secs(session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
+    sec_ids = get_port_secs(user_id)
     data = []
     total_price = 0
     for i in sec_ids:
         ticker = get_ticker_from_id(i)
-        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        purchase_price, shares = get_purchase(user_id, i)
         current_price = get_price_today(i)
         if shares <= 0:
             continue
         data.append({
-            'ticker': ticker,
+            'name': ticker,
             'value': current_price * shares
         })
         total_price = total_price + (current_price * shares)
     data = sorted(data, key=lambda item: item["value"])
-    return jsonify([data, total_price])
+    return jsonify({'data': data, 'total_price': total_price})
 
 
-@app.route('/loadSectorDistribution')
+@app.route('/loadSectorDistribution', methods=['POST'])
 def load_sector_distribution():
+    username = request.json['username']
+    user_id = get_user_id(username)
     sectors = get_all_sectors()
-    sec_ids = get_port_secs(session.get('user_id'))
+    sec_ids = get_port_secs(user_id)
     for i in sec_ids:
         sector = get_sector_from_id(i)
-        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        purchase_price, shares = get_purchase(user_id, i)
         current_price = get_price_today(i)
         if shares <= 0:
             continue

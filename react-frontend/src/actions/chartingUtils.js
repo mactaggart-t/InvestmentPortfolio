@@ -122,7 +122,6 @@ export const formatData = (fullData, time, type, chartType, purchases=[]) => (di
 
 export const CustomTooltip = (content) => {
     if (content.active && content.payload && content.payload.length) {
-        console.log(content.payload);
         if (content.type === '$') {
             return (
                 <div className={'tooltipBackground'}>

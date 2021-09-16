@@ -7,7 +7,7 @@ import {
     addTransaction,
     getPortfolio, getPortfolioTickers,
     getPortValue,
-    getPurchases, getTransactHist, resetLoaded, submitSelectedTickers,
+    getPurchases, getTransactHist, loadPortDiversity, resetLoaded, submitSelectedTickers,
     transactionSubmission
 } from "../../actions/personalInv";
 import {TransactionForm} from './purchaseLogging';
@@ -15,6 +15,7 @@ import {PortBalance} from './portBalance'
 import {IndSecurities} from './indSecurities'
 import DataGrid from "./dataGridTemplate";
 import {toast} from "react-toastify";
+import {PortDiversity} from "./portDiversity";
 
 const transactHistCols = [
   {
@@ -53,10 +54,6 @@ TransactionHist.propTypes = {
     transactHist: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
 };
 
-function PortDiversity(props) {
-    return (<></>);
-}
-
 export class ChartSelector extends Component {
     constructor(props) {
         super(props);
@@ -92,6 +89,8 @@ class ChartOverview extends Component{
             this.props.getPortValue(this.props.username);
             this.props.getPurchases(this.props.username);
             this.props.getPortfolio(this.props.username);
+        } else {
+            toast.dismiss();
         }
         if (this.props.transactHist.length === 0) {
             this.props.getTransactHist(this.props.username);
@@ -99,8 +98,8 @@ class ChartOverview extends Component{
         if (this.props.chartDataInd.length === 0) {
             this.props.getPortfolioTickers(this.props.username);
         }
-        else {
-            toast.dismiss();
+        if (this.props.secDivData.length === 0) {
+            this.props.loadPortDiversity(this.props.username);
         }
     }
 
@@ -120,7 +119,7 @@ class ChartOverview extends Component{
                            items={this.props.items} submitSelectedTickers={this.props.submitSelectedTickers}
                                        loadedInd={this.props.loadedInd} resetLoaded={this.props.resetLoaded}/>);
             case "Portfolio Diversification":
-                return (<PortDiversity/>);
+                return (<PortDiversity secDivData={this.props.secDivData} sectorDivData={this.props.sectorDivData}/>);
             default:
                 return (<TransactionForm addTransaction={this.props.addTransaction}
                                          transactionResponse={this.props.transactionResponse}
@@ -162,6 +161,14 @@ ChartOverview.PropType = {
     ]))).isRequired,
     items: PropTypes.arrayOf(PropTypes.string).isRequired,
     loadedInd: PropTypes.bool.isRequired,
+    secDivData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]))).isRequired,
+    sectorDivData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]))).isRequired,
     submitSelectedTickers: PropTypes.func.isRequired,
     getPortValue: PropTypes.func.isRequired,
     getPurchases: PropTypes.func.isRequired,
@@ -170,6 +177,7 @@ ChartOverview.PropType = {
     transactionSubmission: PropTypes.func.isRequired,
     getTransactHist: PropTypes.func.isRequired,
     getPortfolioTickers: PropTypes.func.isRequired,
+    loadPortDiversity: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -191,9 +199,10 @@ const mapStateToProps = state => ({
     formattedDataInd: state.personalInv.formattedDataInd,
     items: state.personalInv.items,
     loadedInd: state.personalInv.loadedInd,
-
+    secDivData: state.personalInv.secDivData,
+    sectorDivData: state.personalInv.sectorDivData,
 });
 
 export default connect(mapStateToProps, {getPortValue, getPurchases, getPortfolio,
-    addTransaction, transactionSubmission, getTransactHist,
-    getPortfolioTickers, submitSelectedTickers, resetLoaded})(ChartOverview);
+    addTransaction, transactionSubmission, getTransactHist, getPortfolioTickers,
+    submitSelectedTickers, resetLoaded, loadPortDiversity})(ChartOverview);

@@ -102,3 +102,18 @@
 .MuiPaper-root {
     z-index: 0;
 }
+
+.distributionBox {
+    width: 50%;
+    text-align: center;
+}
+
+.piechartTitle {
+    font-family: 'Enriqueta', arial, serif;
+    line-height: 1.25;
+    margin: 10px 0 10px;
+    font-size: 24px;
+    font-weight: normal;
+    text-align: center;
+    width: 100%;
+}

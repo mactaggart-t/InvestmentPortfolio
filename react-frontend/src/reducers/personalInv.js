@@ -19,7 +19,7 @@ import {
     IND_SUBMIT_TICKERS,
     PORT_TICKERS_RETRIEVED,
     FORMAT_DATA_IND,
-    RESET_LOAD
+    RESET_LOAD, SEC_DIV_RETRIEVED, SECTOR_DIV_RETRIEVED
 } from '../actions/types'
 
 const initialState = {
@@ -43,7 +43,9 @@ const initialState = {
     chartDataInd: [],
     formattedDataInd: [],
     items: [],
-    loadedInd: false
+    loadedInd: false,
+    secDivData: [],
+    sectorDivData: [],
 };
 
 function personalInv(state = initialState, action) {
@@ -123,6 +125,10 @@ function personalInv(state = initialState, action) {
                 typeInd: action.payload.type};
         case RESET_LOAD:
             return {...state, loadedInd: false};
+        case SEC_DIV_RETRIEVED:
+            return {...state, secDivData: action.payload.data};
+        case SECTOR_DIV_RETRIEVED:
+            return {...state, sectorDivData: action.payload};
         default:
             return state;
     }
