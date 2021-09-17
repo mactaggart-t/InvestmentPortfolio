@@ -80,16 +80,6 @@ def get_port_tick():
     return jsonify(data)
 
 
-@app.route('/portfolio')
-def portfolio():
-    return render_template('portfolio.html')
-
-
-@app.route('/createAccount')
-def create_account():
-    return render_template('create_portfolio.html')
-
-
 @app.route('/createAcct', methods=['POST'])
 def create_acct():
     username = request.json['username']
@@ -287,11 +277,6 @@ def get_chart():
 def get_single_ticker_info():
     ticker = request.args['ticker'].replace('[', '').replace(']', '').replace('"', '').split(',')[0]
     return jsonify(get_ticker_info(ticker))
-
-
-@app.route('/getHeatmap')
-def get_heatmap_endpoint():
-    return jsonify(get_heatmap())
 
 
 if __name__ == '__main__':
