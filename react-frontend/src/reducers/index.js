@@ -1,5 +1,5 @@
 import about from './aboutReducer';
-import personalInv from './personalInvReducer';
+import personalInv from './personalInv';
 import research from './research';
 import sp500 from './s_and_p';
 import { combineReducers } from 'redux'

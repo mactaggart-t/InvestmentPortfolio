@@ -8,11 +8,11 @@ import {formatData} from "../../actions/chartingUtils";
 function Selectors(props) {
 
     const handleChangeTime = (event, newTime) => {
-        props.formatData(props.chartData, newTime, props.type);
+        props.formatData(props.chartData, newTime, props.type, props.chartType, props.purchases);
     };
 
     const handleChangeType = (event, newType) => {
-        props.formatData(props.chartData, props.time, newType);
+        props.formatData(props.chartData, props.time, newType, props.chartType, props.purchases);
     };
     return (
         <>
@@ -69,13 +69,13 @@ Selectors.propTypes = {
     ]))).isRequired,
     time: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    chartType: PropTypes.string.isRequired,
+    purchases: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)),
     formatData: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
-    chartData: state.research.chartData,
-    time: state.research.time,
-    type: state.research.type,
+
 });
 
 export default connect(mapStateToProps, { formatData })(Selectors)

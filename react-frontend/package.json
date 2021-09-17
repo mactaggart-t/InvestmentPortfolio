@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "latest",
     "@material-ui/lab": "^4.0.0-alpha.58",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
@@ -11,12 +12,16 @@
     "autoprefixer": "latest",
     "axios": "^0.21.1",
     "connected-react-router": "latest",
+    "formik": "^2.2.9",
     "history": "latest",
+    "material-table": "^1.69.3",
     "multiselect-react-dropdown": "latest",
     "prop-types": "latest",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.1",
+    "react-data-grid": "latest",
     "react-dom": "^17.0.2",
+    "react-dropdown-select": "^4.7.4",
     "react-redux": "latest",
     "react-router": "latest",
     "react-router-dom": "latest",
@@ -29,7 +34,8 @@
     "redux": "latest",
     "redux-thunk": "latest",
     "web-vitals": "^1.1.2",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "yup": "^0.32.9"
   },
   "scripts": {
     "start": "react-scripts start",

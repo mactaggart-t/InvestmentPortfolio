@@ -49,19 +49,31 @@ def get_ticker_values():
     return jsonify({'chartData': chart_data, 'selected': tickers})
 
 
+@app.route('/signIn', methods=['POST'])
+def log_in():
+    username = request.json['username']
+    password = request.json['password']
+    if good_login(username, password):
+        session['username'] = username
+        return jsonify({'result': 'success', 'username': username})
+    return jsonify({'result': 'failure'})
+
+
 @app.route('/api/getTreemapData', methods=['GET'])
 def get_treemap_data():
     market_cap_data, all_sectors = get_market_cap_data()
     return jsonify({'marketCapData': market_cap_data, 'allSectors': all_sectors})
 
 
-@app.route('/getPortTickers')
+@app.route('/getPortTickers', methods=['POST'])
 def get_port_tick():
-    sec_ids = get_port_secs(session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
+    sec_ids = get_port_secs(user_id)
     data = []
     for i in sec_ids:
         ticker = get_ticker_from_id(i)
-        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        purchase_price, shares = get_purchase(user_id, i)
         if shares <= 0:
             continue
         data.append(ticker)
@@ -78,32 +90,22 @@ def create_account():
     return render_template('create_portfolio.html')
 
 
-@app.route('/createAcct')
+@app.route('/createAcct', methods=['POST'])
 def create_acct():
-    username = request.args['username']
-    password1 = request.args['password']
-    password2 = request.args['secondPass']
+    username = request.json['username']
+    password1 = request.json['password1']
+    password2 = request.json['password2']
+    response = 'success'
     if password1 != password2:
-        return 'no match'
+        response = 'no match'
     elif password1 == '':
-        return 'no empty'
+        response = 'no empty'
     elif user_taken(username):
-        return 'username taken'
+        response = 'username taken'
     add_user(username, generate_password_hash(password1))
     session['username'] = username
     session['user_id'] = get_user_id(username)
-    return 'success'
-
-
-@app.route('/signIn')
-def log_in():
-    username = request.args['username']
-    password = request.args['password']
-    if good_login(username, password):
-        session['username'] = username
-        session['user_id'] = get_user_id(username)
-        return 'success'
-    return 'failure'
+    return jsonify({'response': response, 'username': username})
 
 
 @app.route('/getUsername')
@@ -111,66 +113,70 @@ def get_username():
     return session.get('username')
 
 
-@app.route('/newTransaction')
+@app.route('/newTransaction', methods=['POST'])
 def new_transaction():
-    if session.get('username') == 'Sample':
-        return 'no sample'
-    user = session.get('user_id')
-    ticker = request.args['ticker']
-    buy = request.args['buy_sell'] == "Buy"
-    price = request.args['price']
-    shares = int(request.args['shares'])
-    dt = request.args['dt']
-    dt = datetime.strptime(dt[0:15], '%a %b %d %Y').date()
+    username = request.json['username']
+    if username == 'Sample':
+        return jsonify('no sample')
+    user_id = get_user_id(username)
+    ticker = request.json['ticker']
+    buy = request.json['buy_sell'] == "Buy"
+    price = request.json['price']
+    shares = request.json['shares']
+    dt = request.json['dt']
+    dt = datetime.strptime(dt[0:9], '%Y-%m-%d').date()
     sec_id = get_security_id(ticker)
     if sec_id is None:
-        if ticker_exists(ticker):
-            add_security(ticker, get_name(ticker), get_sector(ticker),
-                         get_industry(ticker))
-            sec_id = get_security_id(ticker)
-            dates, prices = get_historic_data(ticker, datetime.today().timestamp(),
-                                              datetime(2000, 1, 1, 0, 0).timestamp())
-            add_historic_price(sec_id, prices, dates)
-        else:
-            return 'no exist'
+        # if ticker_exists(ticker):
+        #     add_security(ticker, get_name(ticker), get_sector(ticker),
+        #                  get_industry(ticker))
+        #     sec_id = get_security_id(ticker)
+        #     dates, prices = get_historic_data(ticker, datetime.today().timestamp(),
+        #                                       datetime(2000, 1, 1, 0, 0).timestamp())
+        #     add_historic_price(sec_id, prices, dates)
+        # else:
+        return jsonify('no exist')
     if not buy:
-        if check_valid_sell(shares, sec_id, user, dt):
-            add_purchase(sec_id, user, dt, price, buy, shares)
-            return 'valid sell'
+        if check_valid_sell(shares, sec_id, user_id, dt):
+            add_purchase(sec_id, user_id, dt, price, buy, shares)
+            return jsonify('valid sell')
         else:
-            return 'invalid sell'
-    add_purchase(sec_id, user, dt, price, buy, shares)
-    return 'success'
+            return jsonify('invalid sell')
+    add_purchase(sec_id, user_id, dt, price, buy, shares)
+    return jsonify('success')
 
 
-@app.route('/loadPortfolio')
+@app.route('/loadPortfolio', methods=["POST"])
 def load_portfolio():
-    sec_ids = get_port_secs(session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
+    sec_ids = get_port_secs(user_id)
     portfolio_value = []
-    names = ["Portfolio Value"]
-    ticker = ["PORT"]
     start_date = datetime.today().date()
     end_date = date(2000, 1, 1)
     delta = timedelta(days=1)
     while start_date-delta >= end_date:
         if start_date.weekday() != 5 and start_date.weekday() != 6:
-            portfolio_value.append({'date': start_date, 'price': 0})
+            portfolio_value.append({'date': start_date, 'Value': 0})
         start_date -= delta
     for i in sec_ids:
-        portfolio_value = add_value(i, session.get('user_id'), end_date, portfolio_value)
+        portfolio_value = add_value(i, user_id, end_date, portfolio_value)
     portfolio_value = remove_anomolies(portfolio_value)
-    all_data = jsonify([names, ticker, [portfolio_value]])
+    portfolio_value.reverse()
+    all_data = jsonify({'port_value': portfolio_value})
     return all_data
 
 
-@app.route('/loadPortfolioDataGrid')
+@app.route('/loadPortfolioDataGrid', methods=["POST"])
 def get_portfolio():
-    sec_ids = get_port_secs(session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
+    sec_ids = get_port_secs(user_id)
     data = []
     for i in sec_ids:
         name = get_name_from_id(i)
         ticker = get_ticker_from_id(i)
-        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        purchase_price, shares = get_purchase(user_id, i)
         current_price = get_price_today(i)
         if shares <= 0:
             continue
@@ -182,46 +188,51 @@ def get_portfolio():
              "CurrentPrice": current_price,
              "MarketValue": current_price*shares,
              "Gain$": (current_price-purchase_price)*shares,
-             "Gain%": (current_price-purchase_price)*shares/(purchase_price*shares)
+             "Gain%": "{:.2f}".format(((current_price-purchase_price)*shares/(purchase_price*shares))*100) + '%'
              }
         )
     return jsonify(data)
 
 
-@app.route('/loadTransactionHistory')
+@app.route('/loadTransactionHistory', methods=['POST'])
 def load_transaction_history():
-    user_id = (session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
     data = get_transaction_history(user_id)
     return jsonify(data)
 
 
-@app.route('/loadSecDistribution')
+@app.route('/loadSecDistribution', methods=['POST'])
 def load_sec_distribution():
-    sec_ids = get_port_secs(session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
+    sec_ids = get_port_secs(user_id)
     data = []
     total_price = 0
     for i in sec_ids:
         ticker = get_ticker_from_id(i)
-        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        purchase_price, shares = get_purchase(user_id, i)
         current_price = get_price_today(i)
         if shares <= 0:
             continue
         data.append({
-            'ticker': ticker,
+            'name': ticker,
             'value': current_price * shares
         })
         total_price = total_price + (current_price * shares)
     data = sorted(data, key=lambda item: item["value"])
-    return jsonify([data, total_price])
+    return jsonify({'data': data, 'total_price': total_price})
 
 
-@app.route('/loadSectorDistribution')
+@app.route('/loadSectorDistribution', methods=['POST'])
 def load_sector_distribution():
+    username = request.json['username']
+    user_id = get_user_id(username)
     sectors = get_all_sectors()
-    sec_ids = get_port_secs(session.get('user_id'))
+    sec_ids = get_port_secs(user_id)
     for i in sec_ids:
         sector = get_sector_from_id(i)
-        purchase_price, shares = get_purchase(session.get('user_id'), i)
+        purchase_price, shares = get_purchase(user_id, i)
         current_price = get_price_today(i)
         if shares <= 0:
             continue
@@ -232,9 +243,10 @@ def load_sector_distribution():
     return jsonify(sectors)
 
 
-@app.route('/getTotalPurchase')
+@app.route('/getTotalPurchase', methods=["POST"])
 def get_total_purchase():
-    user_id = (session.get('user_id'))
+    username = request.json['username']
+    user_id = get_user_id(username)
     daily_purchase = get_purchases(user_id)
     return jsonify({'purchase': daily_purchase})
 

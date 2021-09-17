@@ -12,7 +12,7 @@ li.header {
 }
 
 li.header:last-child {
-  border-right: none;
+  border-left:1px solid #bbb;
 }
 
 body {
