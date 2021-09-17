@@ -1,0 +1,119 @@
+.loginBox {
+    border-radius: 10px;
+    outline: 1px solid #1abc9c;
+    perspective: 1px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 25%;
+    min-width: 275px;
+    text-align: center;
+}
+
+.textInput {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 250px;
+    color: #333;
+    font-weight: 400;
+    font-size: 14px;
+    font-family: 'Helvetica Neue','Segoe UI',Helvetica,Verdana,sans-serif;
+    line-height: 1.35715;
+    padding: 7px;
+    margin-top: 10px;
+}
+
+.loginForm {
+    text-align: center;
+}
+
+.formButton {
+    text-transform: none;
+    min-width: 250px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.viewSelector{
+    margin-left: 10px;
+    margin-top: 10px;
+    max-width: 250px;
+    float: left;
+}
+
+.placeholderDiv {
+    float: right;
+    margin-right: 10px;
+    margin-top: 10px;
+    width: 250px;
+    height: 15px;
+}
+
+.chartTitle {
+    font-family: 'Enriqueta', arial, serif;
+    line-height: 1.25;
+    margin: 10px 0 10px;
+    font-size: 30px;
+    font-weight: normal;
+    text-align: center;
+    width: 100%;
+}
+
+.tooltipBackground {
+    background-color: white;
+    padding: 5px;
+    border: 1px solid gray;
+    text-align: center;
+}
+
+.purchaseLabel {
+    float: left;
+}
+
+.purchaseBox {
+    border-radius: 10px;
+    outline: 1px solid #1abc9c;
+    perspective: 1px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    text-align: center;
+    min-width: 350px;
+    max-width: 35%;
+}
+
+.purchaseInput {
+    margin: 10px;
+}
+
+.purchaseRadio {
+    margin: 10px auto 10px auto;
+    width: 100%;
+    text-align: center;
+}
+
+.MuiPaper-root {
+    z-index: 0;
+}
+
+.distributionBox {
+    width: 50%;
+    text-align: center;
+}
+
+.piechartTitle {
+    font-family: 'Enriqueta', arial, serif;
+    line-height: 1.25;
+    margin: 10px 0 10px;
+    font-size: 24px;
+    font-weight: normal;
+    text-align: center;
+    width: 100%;
+}

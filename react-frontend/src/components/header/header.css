@@ -1,0 +1,42 @@
+ul.header {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li.header {
+  float: left;
+  border-right:1px solid #bbb;
+}
+
+li.header:last-child {
+  border-left:1px solid #bbb;
+}
+
+body {
+  margin: 0;
+}
+
+.active {
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  padding: 14px 16px;
+  display: block;
+  background-color: #4CAF50;
+}
+
+.inactive {
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  padding: 14px 16px;
+  display: block;
+  background-color: #333;
+}
+
+.inactive:hover {
+  background-color: #111;
+}
