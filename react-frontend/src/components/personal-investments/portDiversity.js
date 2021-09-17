@@ -47,7 +47,6 @@ CustomTooltipPie.propTypes = {
 const CustomTooltipBar = (content) =>  {
     if (content.active && content.payload && content.payload.length) {
         const totalValue = content.data.map(item => item.value).reduce((prev, next) => prev + next);
-        console.log(content);
         return (
             <div className={'tooltipBackground'}>
                 <p>{`${(content.payload[0].payload.sector ? 

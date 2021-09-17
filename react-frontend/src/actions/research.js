@@ -12,7 +12,7 @@ const instance = axios.create({
 // GET all tickers currently stored in the database
 export const getAllTickers = () => (dispatch) => {
     instance
-        .get('/api/getAllTickers')
+        .get('/getAllTickers')
         .then((res) => {
             dispatch({
                 type: GET_ALL_TICKERS,
@@ -28,7 +28,7 @@ export const getAllTickers = () => (dispatch) => {
 
 export const submitSelectedTickers = (selectedTickers) => (dispatch) => {
     instance
-        .post('/api/getTickerValues', {'selected': selectedTickers})
+        .post('/getTickerValues', {'selected': selectedTickers})
         .then((res) => {
             dispatch({
                 type: SUBMIT_SELECTED_TICKERS,

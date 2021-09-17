@@ -200,7 +200,7 @@ export const getTransactHist = (username) => (dispatch) => {
 
 export const submitSelectedTickers = (selectedTickers) => (dispatch) => {
     instance
-        .post('/api/getTickerValues', {'selected': selectedTickers})
+        .post('/getTickerValues', {'selected': selectedTickers})
         .then((res) => {
             dispatch({
                 type: IND_SUBMIT_TICKERS,

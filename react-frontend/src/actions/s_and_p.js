@@ -9,7 +9,7 @@ const instance = axios.create({
 // GET all tickers currently stored in the database
 export const getTreemapData = () => (dispatch) => {
     instance
-        .get('/api/getTreemapData')
+        .get('/getTreemapData')
         .then((res) => {
             dispatch({
                 type: GET_ALL_SP_CHARTS,

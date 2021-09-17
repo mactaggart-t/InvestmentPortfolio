@@ -1,6 +1,6 @@
 from datetime import datetime, date, timedelta
 
-from flask import Flask, render_template, jsonify, request, session
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash
 
@@ -23,7 +23,7 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return "ok"
 
 
 @app.route('/api/getAllTickers', methods=['GET'])
@@ -49,7 +49,7 @@ def get_ticker_values():
     return jsonify({'chartData': chart_data, 'selected': tickers})
 
 
-@app.route('/signIn', methods=['POST'])
+@app.route('/api/signIn', methods=['POST'])
 def log_in():
     username = request.json['username']
     password = request.json['password']
@@ -65,7 +65,7 @@ def get_treemap_data():
     return jsonify({'marketCapData': market_cap_data, 'allSectors': all_sectors})
 
 
-@app.route('/getPortTickers', methods=['POST'])
+@app.route('/api/getPortTickers', methods=['POST'])
 def get_port_tick():
     username = request.json['username']
     user_id = get_user_id(username)
@@ -80,7 +80,7 @@ def get_port_tick():
     return jsonify(data)
 
 
-@app.route('/createAcct', methods=['POST'])
+@app.route('/api/createAcct', methods=['POST'])
 def create_acct():
     username = request.json['username']
     password1 = request.json['password1']
@@ -103,7 +103,7 @@ def get_username():
     return session.get('username')
 
 
-@app.route('/newTransaction', methods=['POST'])
+@app.route('/api/newTransaction', methods=['POST'])
 def new_transaction():
     username = request.json['username']
     if username == 'Sample':
@@ -136,7 +136,7 @@ def new_transaction():
     return jsonify('success')
 
 
-@app.route('/loadPortfolio', methods=["POST"])
+@app.route('/api/loadPortfolio', methods=["POST"])
 def load_portfolio():
     username = request.json['username']
     user_id = get_user_id(username)
@@ -157,7 +157,7 @@ def load_portfolio():
     return all_data
 
 
-@app.route('/loadPortfolioDataGrid', methods=["POST"])
+@app.route('/api/loadPortfolioDataGrid', methods=["POST"])
 def get_portfolio():
     username = request.json['username']
     user_id = get_user_id(username)
@@ -184,7 +184,7 @@ def get_portfolio():
     return jsonify(data)
 
 
-@app.route('/loadTransactionHistory', methods=['POST'])
+@app.route('/api/loadTransactionHistory', methods=['POST'])
 def load_transaction_history():
     username = request.json['username']
     user_id = get_user_id(username)
@@ -192,7 +192,7 @@ def load_transaction_history():
     return jsonify(data)
 
 
-@app.route('/loadSecDistribution', methods=['POST'])
+@app.route('/api/loadSecDistribution', methods=['POST'])
 def load_sec_distribution():
     username = request.json['username']
     user_id = get_user_id(username)
@@ -214,7 +214,7 @@ def load_sec_distribution():
     return jsonify({'data': data, 'total_price': total_price})
 
 
-@app.route('/loadSectorDistribution', methods=['POST'])
+@app.route('/api/loadSectorDistribution', methods=['POST'])
 def load_sector_distribution():
     username = request.json['username']
     user_id = get_user_id(username)
@@ -233,7 +233,7 @@ def load_sector_distribution():
     return jsonify(sectors)
 
 
-@app.route('/getTotalPurchase', methods=["POST"])
+@app.route('/api/getTotalPurchase', methods=["POST"])
 def get_total_purchase():
     username = request.json['username']
     user_id = get_user_id(username)
@@ -241,7 +241,7 @@ def get_total_purchase():
     return jsonify({'purchase': daily_purchase})
 
 
-@app.route('/getTickerInfo')
+@app.route('/api/getTickerInfo')
 def get_price():
     ticker_name = request.args['tickers'].replace('[', '').replace(']', '').replace('"', '').split(',')
     sec_id = []
@@ -267,17 +267,17 @@ def get_price():
     return all_data
 
 
-@app.route('/getSecurityChart')
+@app.route('/api/getSecurityChart')
 def get_chart():
     ticker_name = request.args['ticker_name']
     return get_historic_data(ticker_name, datetime(2016, 1, 19, 0, 0).timestamp(), datetime.today().timestamp())
 
 
-@app.route('/getSingleTickerInfo')
+@app.route('/api/getSingleTickerInfo')
 def get_single_ticker_info():
     ticker = request.args['ticker'].replace('[', '').replace(']', '').replace('"', '').split(',')[0]
     return jsonify(get_ticker_info(ticker))
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=8080)
