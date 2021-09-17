@@ -15,7 +15,6 @@ from sql.get_security_id import (get_ticker_from_id, get_name_from_id, get_purch
 from sql.transaction_history import get_transaction_history
 from sql.get_basic_info import get_all_sectors, sector_conversion, get_ticker_info
 from sql.get_treemap_data import get_market_cap_data
-from loguru import logger
 
 app = Flask(__name__, template_folder='./react-frontend', static_folder="./react-frontend")
 app.secret_key = 'test'
@@ -126,13 +125,6 @@ def new_transaction():
     shares = request.json['shares']
     dt = request.json['dt']
     dt = datetime.strptime(dt[0:9], '%Y-%m-%d').date()
-    logger.info(username)
-    logger.info(user_id)
-    logger.info(ticker)
-    logger.info(buy)
-    logger.info(price)
-    logger.info(shares)
-    logger.info(dt)
     sec_id = get_security_id(ticker)
     if sec_id is None:
         # if ticker_exists(ticker):
