@@ -1,3 +1,4 @@
+import datetime
 from mysql.connector import Error
 from sql.get_security_id import get_ticker_from_id
 import pymysql
@@ -19,8 +20,11 @@ def get_historic_price_db(sec_id):
         formated_data = []
         data.reverse()
         for i in data:
+            if isinstance(i[0], str):
+                continue
             if not any(d['date'] == i[0] for d in formated_data):
                 formated_data.append({'date': i[0], 'price': i[1], 'ticker': ticker})
+
     except Error as error:
         print("parameterized query failed {}".format(error))
     finally:
