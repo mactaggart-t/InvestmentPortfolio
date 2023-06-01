@@ -29,7 +29,7 @@ The backend API is built as a flask app which is connected to an AWS RDS databas
 
 The deployment process was built off of the following medium [article](https://adamraudonis.medium.com/how-to-deploy-a-website-on-aws-with-docker-flask-react-from-scratch-d0845ebd9da4)
 
-You can access the latest stable release of the website [here](https://d34dkp2lqieu89.cloudfront.net/)
+You can access the latest stable release of the website [here](https://d34dkp2lqieu89.cloudfront.net/) (backend currently down)
 
 To run the app locally run the following commands:
 
